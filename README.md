@@ -1,0 +1,59 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# multistatemodels
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+multistatemodels provides a package for simulating and fitting
+multistate models especially semi-Markov models, to panel data and
+interval censored data. This is a wrapper to the Julia package
+MultistateModels.jl. Add some more about why it is good to call Julia
+from R…advantages, etc.
+
+## Installation
+
+You can install the development version of multistatemodels from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("ammateja/multistatemodels")
+```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+``` r
+library(multistatemodels)
+
+#multistatemodels_setup()
+multistatemodels <- multistatemodels_load()
+#> Starting Julia ...
+```
+
+``` r
+df <- read.csv("H:/Projects/Jon/R package and Julia/Julia/derived_states_regen.csv")
+d <- collapse_data(df[ ,-12], multistatemodels)
+
+#h12 <- Hazard(formula = 0 ~ 1+mab, family = "sp", statefrom = 1, stateto=2,
+#multistatemodels=multistatemodels, degree=1)
+h12 <- Hazard(formula = 0 ~ 1+mab, family = "sp", statefrom = 1, stateto=2,
+              multistatemodels=multistatemodels, degree=1, knots=5/7)
+h23 <- Hazard(formula = 0 ~ 1+mab, family = "exp", statefrom = 2, stateto=3,
+              multistatemodels=multistatemodels)
+h24 <- Hazard(formula = 0 ~ 1+mab, family = "exp", statefrom = 2, stateto=4,
+              multistatemodels=multistatemodels)
+h45 <- Hazard(formula = 0 ~ 1+mab, family = "exp", statefrom = 4, stateto=5,
+              multistatemodels=multistatemodels)
+#h45 <- Hazard(formula = 0 ~ 1+mab, family = "exp", statefrom = 4, stateto=5,
+#multistatemodels=multistatemodels, degree=1)
+
+CensoringPatterns <- matrix(c(3, 1, 0, 1, 0, 0), nrow=1, ncol=6)
+
+model <- multistatemodel(hazard = c(h12, h23, h24, h45), data = d[[1]], 
+                         SamplingWeights = d[[2]], CensoringPatterns = CensoringPatterns,
+                         nPatterns = 1, multistatemodels =multistatemodels)
+```
