@@ -116,9 +116,13 @@ collapse_data <- function(df, multistatemodels, SamplingWeights = rep(1, length(
 #' @param family One of "exp" or "wei" for exponential or Weibull cause-specific
 #' baseline hazard functions, or "sp" for a semi-parametric spline basis for the
 #' baseline hazard (defaults to M-splines).
+#' @param df For family="sp": Degrees of freedom
 #' @param degree For family="sp": degree of the spline polynomial basis
+#' @param monotonic For family="sp": Assume that baseline hazard is monotonic, defaults "nonmonotonic".
+#' If "increasing" or "decreasing", use an I-spline basis for the baseline intensity and a C-spline for the cumulative intensity.
+#' @param meshsize For family="sp": number of intervals into which to discretize the spline basis, defaults to 10000.
 #' @param knots For family="sp": Vector of knots
-#' @param ... ADD HERE
+#' @param boundaryknots For family="sp": Length 2 vector of boundary knots.
 #'
 #' @return An environment with a Julia hazard
 #' @export
@@ -136,26 +140,24 @@ collapse_data <- function(df, multistatemodels, SamplingWeights = rep(1, length(
 #' \dontshow{
 #' JuliaConnectoR::stopJulia()
 #' }
-Hazard <- function(formula, statefrom, stateto, multistatemodels, family = c("exp", "wei", "sp"), degree=3, knots=NULL, ...) {
-  if (family == "sp" & (is.null(degree) | is.null(knots))) {
-    stop("Degree and knots must be provided for splines")
-  }
-
-  if (family != "sp" & (!is.null(knots))) {
-    warning("Degree and knots not required for this model, will be ignored")
-  }
+Hazard <- function(formula, statefrom, stateto, multistatemodels, family = c("exp", "wei", "sp"), df=NULL,
+                   degree=3, monotonic = "nonmonotonic", meshsize=10000, knots=NULL, boundaryknots=NULL) {
 
   if (!family %in% c("exp", "wei", "sp")) {
     stop("family must be one of 'exp', 'wei', or 'sp'")
   }
 
-  rhs <- paste(c(1, labels(stats::terms(formula))), collapse = " + ")
-  form <- JuliaConnectoR::juliaEval(paste0("@formula(", as.character(stats::terms(formula)[[2]]), as.character(stats::terms(formula)[[1]]), rhs, ")"))
+  rhs <- paste(c(1, labels(terms(formula))), collapse = " + ")
+  form <- JuliaConnectoR::juliaEval(paste0("@formula(", as.character(terms(formula)[[2]]), as.character(terms(formula)[[1]]), rhs, ")"))
 
   if (family == "sp") {
     knots <- JuliaConnectoR::juliaEval(paste0("vec([", knots, "])"))
+    if (!is.null(df)) {
+      df <- JuliaConnectoR::juliaCall("Int", df)
+    }
     haz <- multistatemodels$Hazard(form, family, JuliaConnectoR::juliaCall("Int", statefrom), JuliaConnectoR::juliaCall("Int", stateto),
-                                   degree = JuliaConnectoR::juliaCall("Int", degree), knots = knots)
+                                   degree = JuliaConnectoR::juliaCall("Int", degree), knots = knots, df = df,
+                                   monotonic = monotonic, meshsize = JuliaConnectoR::juliaCall("Int", meshsize), boundaryknots=boundaryknots)
   } else {
     haz <- multistatemodels$Hazard(form, family, JuliaConnectoR::juliaCall("Int", statefrom), JuliaConnectoR::juliaCall("Int", stateto))
   }
@@ -163,6 +165,7 @@ Hazard <- function(formula, statefrom, stateto, multistatemodels, family = c("ex
   return(haz)
 
 }
+
 
 
 #' Construct a multistate model
