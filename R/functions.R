@@ -254,10 +254,11 @@ initialize_parameters <- function(model, multistatemodels, constraints = NULL, p
 #' @param crude_inits logical; Defaults to TRUE
 #' @param verbose logical; print messages, defaults to TRUE
 #'
-#' @return
+#' @return A Julia environment with a fitted Markov surrogate model
 #' @export
 #'
 #' @examples
+#' model_fitted_surrogate <- fit_surrogate(model=model, multistatemodels=multistatemodels)
 fit_surrogate <- function(model, multistatemodels, surrogate_parameters = NULL, surrogate_constraints = NULL, crude_inits = TRUE, verbose = TRUE) {
 
   multistatemodels$fit_surrogate(model, surrogate_parameters = surrogate_parameters, surrogate_constraints = surrogate_constraints, crude_inits = crude_inits, verbose = verbose)
@@ -335,7 +336,7 @@ fit <- function(model, multistatemodels, verbose=TRUE, compute_vcov=TRUE, constr
 #' @param min_ess minimum effective sample size per subject, defaults to 100.
 #' @param loglik value of the log-likelihood to use, if provided.
 #'
-#' @return
+#' @return An integer with calculated AIC
 #' @export
 #'
 #' @examples
@@ -362,7 +363,7 @@ aic <- function(model_fitted, multistatemodels, estimate_likelihood = TRUE, min_
 #' @param min_ess minimum effective sample size per subject, defaults to 100.
 #' @param loglik value of the log-likelihood to use, if provided.
 #'
-#' @return
+#' @return An integer with calculated BIC
 #' @export
 #'
 #' @examples
@@ -386,7 +387,8 @@ bic <- function(model_fitted, multistatemodels, estimate_likelihood = TRUE, min_
 #' @param model_fitted A fitted multistate models object
 #' @param multistatemodels Loaded multistatemodels Julia environment
 #'
-#' @return
+#' @return A Julia environment with status, candidate solution, algorithm,
+#' convergence records, and work counters
 #' @export
 #'
 #' @examples
@@ -412,7 +414,7 @@ get_ConvergenceRecords <- function(model_fitted, multistatemodels) {
 #' @param ll string; one of "loglik" (default) for the observed data log-likelihood or
 #' "subj_lml" for log marginal likelihood at the subject level
 #'
-#' @return
+#' @return An integer with the log-likelihood at the MLE
 #' @export
 #'
 #' @examples
@@ -440,7 +442,7 @@ get_loglik <- function(model_fitted, multistatemodels, ll="loglik") {
 #' @param model_fitted A fitted multistate models object
 #' @param multistatemodels Loaded multistatemodels Julia environment
 #'
-#' @return
+#' @return A matrix of model parameters
 #' @export
 #'
 #' @examples
@@ -451,7 +453,10 @@ get_parameters <- function(model_fitted, multistatemodels) {
     stop("Fitted model of type MultistateModels.MultistateModelFitted must be provided")
   }
 
-  multistatemodels$get_parameters(model_fitted)
+  pars <- multistatemodels$get_parameters(model_fitted)
+  pars_list <- JuliaConnectoR::juliaGet(JuliaConnectoR::juliaCall("Tuple", pars))
+
+  matrix(unlist(pars_list), nrow=length(pars_list), byrow=T)
 
 }
 
@@ -464,7 +469,7 @@ get_parameters <- function(model_fitted, multistatemodels) {
 #' @param model_fitted A fitted multistate models object
 #' @param multistatemodels Loaded multistatemodels Julia environment
 #'
-#' @return
+#' @return A matrix with parameter names as strings
 #' @export
 #'
 #' @examples
@@ -475,7 +480,10 @@ get_parnames <- function(model_fitted, multistatemodels) {
     stop("Fitted model of type MultistateModels.MultistateModelFitted must be provided")
   }
 
-  multistatemodels$get_parnames(model_fitted)
+  parnames <- multistatemodels$get_parnames(model_fitted)
+  parnames_list <- JuliaConnectoR::juliaGet(JuliaConnectoR::juliaCall("Tuple", parnames))
+
+  matrix(as.character(unlist(parnames_list)), nrow=length(parnames_list), byrow=T)
 
 }
 
@@ -488,7 +496,7 @@ get_parnames <- function(model_fitted, multistatemodels) {
 #' @param model_fitted A fitted multistate models object
 #' @param multistatemodels Loaded multistatemodels Julia environment
 #'
-#' @return
+#' @return Variance-covariance matrix
 #' @export
 #'
 #' @examples
@@ -510,11 +518,11 @@ get_vcov <- function(model_fitted, multistatemodels) {
 #' @param ucons ucons
 #' @param multistatemodels Loaded multistatemodels Julia environment
 #'
-#' @return
+#' @return A Julia environment with a named Tuple of constraints
 #' @export
 #'
 #' @examples
-#' constraints_weibull = make_constraints(cons = "h12_shape", lcons = 0, ucons = 0)
+#' constraints_weibull = make_constraints(cons = "h12_shape", lcons = 0, ucons = 0, ultistatemodels=multistatemodels)
 #' model_fitted=fit(model=model, multistatemodels=multistatemodels, constraints=constraints_weibull)
 
 make_constraints <- function(cons, lcons, ucons, multistatemodels) {
@@ -549,7 +557,7 @@ make_constraints <- function(cons, lcons, ucons, multistatemodels) {
 #' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param subj subject id
 #'
-#' @return
+#' @return An integer or vector of integers with the hazard at the specified time(s)
 #' @export
 #'
 #' @examples
