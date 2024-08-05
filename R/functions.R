@@ -134,8 +134,9 @@ collapse_data <- function(dat, multistatemodels, SamplingWeights = rep(1, length
 #' @param degree For family="sp": degree of the spline polynomial basis
 #' @param natural_spline For family="sp": logical; Restrict the second derivative to zero at the boundaries, defaults to TRUE.
 #' @param extrapolation For family="sp": string; Either "linear" or "flat", defaults to "linear"
-#' @param add_boundaries For family="sp": logical; should spline knot locations be augmented with 0 and the maximum
-#' sojourn in the data? defaults to TRUE so that the 'knots' argument is interpreted as interior knots.
+#' @param monotone For family="sp": 0, -1, or 1 for non-monotone, monotone decreasing, or monotone increasing.
+#' @param boundaryknots For family="sp": Optional vector of boundary knots,
+#' defaults to the range of possible sojourn times if not supplied.
 #' @param knots For family="sp": Optional vector of knots. Defaults to the range of sojourns in
 #' the data with no interior knots if not supplied.
 #'
@@ -156,7 +157,8 @@ collapse_data <- function(dat, multistatemodels, SamplingWeights = rep(1, length
 #' JuliaConnectoR::stopJulia()
 #' }
 Hazard <- function(formula, statefrom, stateto, multistatemodels, family = c("exp", "wei", "sp"),
-                   degree=3, natural_spline=TRUE, extrapolation="linear", add_boundaries=TRUE, knots=NULL) {
+                   degree=3, natural_spline=T, extrapolation="linear", monotone=0, knots=NULL,
+                   boundaryknots=NULL) {
 
   if (!family %in% c("exp", "wei", "sp")) {
     stop("family must be one of 'exp', 'wei', or 'sp'")
@@ -170,7 +172,7 @@ Hazard <- function(formula, statefrom, stateto, multistatemodels, family = c("ex
 
     haz <- multistatemodels$Hazard(form, family, JuliaConnectoR::juliaCall("Int", statefrom), JuliaConnectoR::juliaCall("Int", stateto),
                                    degree = JuliaConnectoR::juliaCall("Int", degree), knots = knots, extrapolation = extrapolation, natural_spline = natural_spline,
-                                   add_boundaries = add_boundaries)
+                                   monotone = monotone, boundaryknots=boundaryknots)
   } else {
     haz <- multistatemodels$Hazard(form, family, JuliaConnectoR::juliaCall("Int", statefrom), JuliaConnectoR::juliaCall("Int", stateto))
   }
@@ -231,16 +233,17 @@ multistatemodel <- function(hazard, data, multistatemodels,
 #' @param model A model created in the multistatemodel function
 #' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param constraints Constraints on model parameters
-#' @param parameters Parameters
+#' @param surrogate_constraints Surrogate constraints
+#' @param surrogate_parameters Surrogate parameters
 #' @param crude logical; Defaults to FALSE
 #'
 #' @export
 #'
 #' @examples
 #' initialize_parameters(model=model, multistatemodels = multistatemodels)
-initialize_parameters <- function(model, multistatemodels, constraints = NULL, parameters=NULL, crude=FALSE) {
+initialize_parameters <- function(model, multistatemodels, constraints = NULL, surrogate_constraints = NULL, surrogate_parameters=NULL, crude=FALSE) {
 
-  multistatemodels$`initialize_parameters!`(model, constraints = constraints, parameters=parameters, crude=crude)
+  multistatemodels$`initialize_parameters!`(model, constraints = constraints, surrogate_constraints = surrogate_constraints, surrogate_parameters=surrogate_parameters, crude=crude)
 
 }
 
@@ -582,11 +585,11 @@ compute_hazard <- function(t, model, hazard, multistatemodels, subj=1) {
 #' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param subj subject id
 #'
-#' @return
+#' @return An integer with the cumulative hazard over (tsart, tstop)
 #' @export
 #'
 #' @examples
-#' compute_hazard(tstart=2, tstop=3, model=model, hazard="h12", multistatemodels=multistatemodels)
+#' compute_cumulative_hazard(tstart=2, tstop=3, model=model, hazard="h12", multistatemodels=multistatemodels)
 compute_cumulative_hazard <- function(tstart, tstop, model, hazard, multistatemodels, subj = 1) {
 
   hazard <- paste0(":", hazard)
@@ -605,7 +608,7 @@ compute_cumulative_hazard <- function(tstart, tstop, model, hazard, multistatemo
 #' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param min_ess minimum effective sample size, defaults to 100.
 #'
-#' @return
+#' @return A Julia environment with a named Tuple
 #' @export
 #'
 #' @examples
@@ -629,7 +632,7 @@ estimate_loglik <- function(model, multistatemodels, min_ess = 100) {
 #' @param paretosmooth logical; pareto smooth importance weights, defaults to TRUE unless min_ess < 25.
 #' @param return_logliks logical; defaults to FALSE
 #'
-#' @return
+#' @return A Julia environment with a named Tuple of sample paths
 #' @export
 #'
 #' @examples
@@ -647,12 +650,13 @@ draw_paths <- function(model, multistatemodels, min_ess = 100, paretosmooth=TRUE
 #' Compute the cumulative incidence for each possible transition as a function of time since state entry.
 #' Assumes the subject starts their observation period at risk and saves cumulative incidence at the supplied vector of times, t.
 #'
-#' @param t time
+#' @param t time or a vector of times
 #' @param model multistate model
 #' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param subj subject id
 #'
-#' @return
+#' @return A matrix with the cumulative incidence where columns represent each
+#' possible transition and rows represent t
 #' @export
 #'
 #' @examples
@@ -664,6 +668,20 @@ cumulative_incidence <- function(t, model, multistatemodels, subj=1) {
 }
 
 
+#' Set parameters
+#'
+#' @description Set model parameters given a vector of values.
+#' Copies newvalues to model.parameters.
+#'
+#' @param model multistate model
+#' @param multistatemodels Loaded multistatemodels Julia environment
+#' @param newvalues A list, each element of the list is new parameters for each hazard
+#'
+#' @export
+#'
+#' @examples
+#' set_parameters(model, multistatemodels, newvalues = list(h12 = c(log(1.5), log(1)),
+#' h23=c(log(2/3), log(1)), h24=c(log(1), log(1.25)), h45=c(log(1), log(1.25))))
 set_parameters <- function(model, multistatemodels, newvalues) {
 
   values <- NULL
@@ -703,14 +721,15 @@ set_parameters <- function(model, multistatemodels, newvalues) {
 #' @param delta_u minimum cumulative incidence increment per-jump, defaults to the larger of (1 / N subjects)^2 or sqrt(eps())
 #' @param delta_t minimum time increment per-jump, defaults to sqrt(eps())
 #'
-#' @return
+#' @return A data frame with simulated data
 #' @export
 #'
 #' @examples
 #' simulate(model=model, multistatemodels=multistatemodels)
 simulate <- function(model, multistatemodels, nsim=1, data=TRUE, paths=FALSE, delta_u = sqrt(.Machine$double.eps), delta_t = sqrt(.Machine$double.eps)) {
 
-  multistatemodels$simulate(model, nsim = JuliaConnectoR::juliaCall("Int", nsim), data=data, paths=paths, delta_u=delta_u, delta_t=delta_t)
+  sim_dat <- multistatemodels$simulate(model, nsim = JuliaConnectoR::juliaCall("Int", nsim), data=data, paths=paths, delta_u=delta_u, delta_t=delta_t)
+  as.data.frame(sim_dat[[1]])
 
 }
 
@@ -723,7 +742,9 @@ simulate <- function(model, multistatemodels, nsim=1, data=TRUE, paths=FALSE, de
 #' @param estimate_likelihood logical; estimate likelihood, defaults to FALSE
 #' @param min_ess minimum effective sample size, defaults to 100.
 #'
-#' @return
+#' @return A Julia environment with a named Tuple
+#' Estimate, SE, upper and lower confidence limits for each hazard parameter
+#' loglik, AIC, BIC, MCSE_loglik
 #' @export
 #'
 #' @examples
