@@ -567,8 +567,15 @@ make_constraints <- function(cons, lcons, ucons, multistatemodels) {
 #' compute_hazard(t=2, model=model, hazard="h12", multistatemodels=multistatemodels)
 compute_hazard <- function(t, model, hazard, multistatemodels, subj=1) {
 
+  hazards <- NULL
+
   hazard <- paste0(":", hazard)
-  multistatemodels$compute_hazard(t, model, JuliaConnectoR::juliaEval(hazard), JuliaConnectoR::juliaCall("Int", subj))[1]
+
+  for (i in 1:length(t)) {
+    hazards <- append(hazards, multistatemodels$compute_hazard(t[i], model, JuliaConnectoR::juliaEval(hazard), JuliaConnectoR::juliaCall("Int", subj))[1])
+  }
+
+  return(hazards)
 
 }
 
@@ -592,10 +599,21 @@ compute_hazard <- function(t, model, hazard, multistatemodels, subj=1) {
 #' compute_cumulative_hazard(tstart=2, tstop=3, model=model, hazard="h12", multistatemodels=multistatemodels)
 compute_cumulative_hazard <- function(tstart, tstop, model, hazard, multistatemodels, subj = 1) {
 
+  if (length(tstart) != length(tstop)) {
+    stop("tstart and tstop must be the same length")
+  }
+  hazards <- NULL
+
   hazard <- paste0(":", hazard)
-  multistatemodels$compute_cumulative_hazard(tstart, tstop, model, JuliaConnectoR::juliaEval(hazard), JuliaConnectoR::juliaCall("Int", subj))[1]
+
+  for (i in 1:length(tstart)) {
+    hazards <- append(hazards, multistatemodels$compute_cumulative_hazard(tstart[i], tstop[i], model, JuliaConnectoR::juliaEval(hazard), JuliaConnectoR::juliaCall("Int", subj))[1])
+  }
+
+  return(hazards)
 
 }
+
 
 
 #' Estimate log-likelihood
