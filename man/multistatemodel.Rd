@@ -27,10 +27,10 @@ multistatemodel(
 
 \item{nPatterns}{Number of user-defined censoring patterns}
 
-\item{verbose}{Defaults to FALSE}
+\item{verbose}{logical; print messages, defaults to FALSE}
 }
 \value{
-A Julia MultistateModel that can be used for simulation and inference
+A Julia MultistateModel environment that can be used for simulation and inference
 }
 \description{
 Construct a multistate model
