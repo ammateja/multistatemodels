@@ -11,8 +11,11 @@ Hazard(
   multistatemodels,
   family = c("exp", "wei", "sp"),
   degree = 3,
+  natural_spline = T,
+  extrapolation = "linear",
+  monotone = 0,
   knots = NULL,
-  ...
+  boundaryknots = NULL
 )
 }
 \arguments{
@@ -26,15 +29,23 @@ Must be specified with "0 ~" on the left hand side.}
 
 \item{multistatemodels}{Loaded multistatemodels Julia environment}
 
-\item{family}{One of "exp" or "wei" for exponential or Weibull cause-specific
+\item{family}{string; One of "exp" or "wei" for exponential or Weibull cause-specific
 baseline hazard functions, or "sp" for a semi-parametric spline basis for the
 baseline hazard (defaults to M-splines).}
 
 \item{degree}{For family="sp": degree of the spline polynomial basis}
 
-\item{knots}{For family="sp": Vector of knots}
+\item{natural_spline}{For family="sp": logical; Restrict the second derivative to zero at the boundaries, defaults to TRUE.}
 
-\item{...}{ADD HERE}
+\item{extrapolation}{For family="sp": string; Either "linear" or "flat", defaults to "linear"}
+
+\item{monotone}{For family="sp": 0, -1, or 1 for non-monotone, monotone decreasing, or monotone increasing.}
+
+\item{knots}{For family="sp": Optional vector of knots. Defaults to the range of sojourns in
+the data with no interior knots if not supplied.}
+
+\item{boundaryknots}{For family="sp": Optional vector of boundary knots,
+defaults to the range of possible sojourn times if not supplied.}
 }
 \value{
 An environment with a Julia hazard

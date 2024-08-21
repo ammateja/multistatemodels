@@ -1,65 +1,3 @@
-#' Check Julia setup
-#'
-#' @param ... Ignored
-#'
-#' @export
-#'
-#' @examples
-#' multistatemodels_setup()
-multistatemodels_setup <- function(...){
-  if (JuliaConnectoR::juliaSetupOk()){
-    JuliaConnectoR::juliaEval('
-       import Pkg
-       Pkg.add(url = "https://github.com/fintzij/MultistateModels.jl.git")
-       Pkg.add("CSV")
-       Pkg.add("DataFrames")
-       Pkg.add("Distributions")
-       Pkg.add("LinearAlgebra")
-       Pkg.add("JLD2")
-       Pkg.add("ArraysOfArrays")
-       Pkg.add("Random")')
-  }
-  else {
-    stop("Julia setup incorrect.
-         Ensure Julia version >= 1.0 is properly installed.")
-  }
-}
-
-
-#' Load Julia
-#'
-#' @description Load needed Julia packages. Run to use multistatemodels.
-#'
-#' @param ... Ignored
-#'
-#' @export
-#'
-#' @examples
-#' multistatemodels <- multistatemodels_load()
-multistatemodels_load <- function(...){
-  tryCatch({
-    JuliaConnectoR::juliaEval('
-          using MultistateModels
-          using CSV
-          using DataFrames
-          using Distributions
-          using LinearAlgebra
-          using JLD2
-          using ArraysOfArrays
-          using Random')
-    multistatemodels <- JuliaConnectoR::juliaImport("MultistateModels")
-    return(multistatemodels)
-  },
-  error=function(e) {
-    stop("Run multistatemodels.multistatemodels_setup() once
-            to complete installation and reload multistatemodels.")
-  }
-  )
-}
-
-
-
-
 check_data <- function(dat) {
 
   JuliaConnectoR::juliaLet('if any(names(dat)[1:6] .!== ["id", "tstart", "tstop", "statefrom", "stateto", "obstype"])
@@ -87,7 +25,6 @@ check_data <- function(dat) {
 #' dataset and optionally recompute a vector of sampling weights.
 #'
 #' @param dat A data frame
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param SamplingWeights Sampling weights, defaults to 1 for each id in the data
 #'
 #' @return A 2-element list. The first element is a data frame and the second
@@ -95,22 +32,21 @@ check_data <- function(dat) {
 #' @export
 #'
 #' @examples
-#' multistatemodels <- multistatemodels_load()
 #' df <- read.csv("~/derived_states_regen.csv")
-#' d <- collapse_data(df, multistatemodels)
+#' d <- collapse_data(df)
 #' \dontshow{
 #' JuliaConnectoR::stopJulia()
 #' }
-collapse_data <- function(dat, multistatemodels, SamplingWeights = rep(1, length(unique(dat$id)))) {
+collapse_data <- function(dat, SamplingWeights = rep(1, length(unique(dat$id)))) {
 
   df <- readr::format_csv(dat)
 
-  df2 <- juliaLet("CSV.read(IOBuffer(df), DataFrame)", df=df)
+  df2 <- JuliaConnectoR::juliaLet("CSV.read(IOBuffer(df), DataFrame)", df=df)
   df2 <- JuliaConnectoR::juliaCall("DataFrame", df2)
 
   check_data(df2)
 
-  d <- multistatemodels$collapse_data(df2, SamplingWeights = SamplingWeights)
+  d <- multistatemodels_env$collapse_data(df2, SamplingWeights = SamplingWeights)
   return(list(as.data.frame(d[[1]]), d[[2]]))
 
 }
@@ -127,7 +63,6 @@ collapse_data <- function(dat, multistatemodels, SamplingWeights = rep(1, length
 #' Must be specified with "0 ~" on the left hand side.
 #' @param statefrom Integer specifying the origin state
 #' @param stateto Integer specifying the destination state
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param family string; One of "exp" or "wei" for exponential or Weibull cause-specific
 #' baseline hazard functions, or "sp" for a semi-parametric spline basis for the
 #' baseline hazard (defaults to M-splines).
@@ -144,19 +79,15 @@ collapse_data <- function(dat, multistatemodels, SamplingWeights = rep(1, length
 #' @export
 #'
 #' @examples
-#' multistatemodels <- multistatemodels_load()
 #' h12 <- Hazard(formula = 0 ~ 1+mab, family = "sp", statefrom = 1, stateto=2,
-#' multistatemodels=multistatemodels, degree=1, knots=5/7)
-#' h23 <- Hazard(formula = 0 ~ 1+mab, family = "exp", statefrom = 2, stateto=3,
-#' multistatemodels=multistatemodels)
-#' h24 <- Hazard(formula = 0 ~ 1+mab, family = "exp", statefrom = 2, stateto=4,
-#' multistatemodels=multistatemodels)
-#' h45 <- Hazard(formula = 0 ~ 1+mab, family = "exp", statefrom = 4, stateto=5,
-#' multistatemodels=multistatemodels)
+#' degree=1, knots=5/7)
+#' h23 <- Hazard(formula = 0 ~ 1+mab, family = "exp", statefrom = 2, stateto=3)
+#' h24 <- Hazard(formula = 0 ~ 1+mab, family = "exp", statefrom = 2, stateto=4)
+#' h45 <- Hazard(formula = 0 ~ 1+mab, family = "exp", statefrom = 4, stateto=5)
 #' \dontshow{
 #' JuliaConnectoR::stopJulia()
 #' }
-Hazard <- function(formula, statefrom, stateto, multistatemodels, family = c("exp", "wei", "sp"),
+Hazard <- function(formula, statefrom, stateto, family = c("exp", "wei", "sp"),
                    degree=3, natural_spline=T, extrapolation="linear", monotone=0, knots=NULL,
                    boundaryknots=NULL) {
 
@@ -170,15 +101,14 @@ Hazard <- function(formula, statefrom, stateto, multistatemodels, family = c("ex
   if (family == "sp") {
     knots <- JuliaConnectoR::juliaEval(paste0("vec([", knots, "])"))
 
-    haz <- multistatemodels$Hazard(form, family, JuliaConnectoR::juliaCall("Int", statefrom), JuliaConnectoR::juliaCall("Int", stateto),
+    haz <- multistatemodels_env$Hazard(form, family, JuliaConnectoR::juliaCall("Int", statefrom), JuliaConnectoR::juliaCall("Int", stateto),
                                    degree = JuliaConnectoR::juliaCall("Int", degree), knots = knots, extrapolation = extrapolation, natural_spline = natural_spline,
                                    monotone = monotone, boundaryknots=boundaryknots)
   } else {
-    haz <- multistatemodels$Hazard(form, family, JuliaConnectoR::juliaCall("Int", statefrom), JuliaConnectoR::juliaCall("Int", stateto))
+    haz <- multistatemodels_env$Hazard(form, family, JuliaConnectoR::juliaCall("Int", statefrom), JuliaConnectoR::juliaCall("Int", stateto))
   }
 
   return(haz)
-
 }
 
 
@@ -187,7 +117,6 @@ Hazard <- function(formula, statefrom, stateto, multistatemodels, family = c("ex
 #'
 #' @param hazard A vector of cause specific hazards
 #' @param data Data frame
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param SamplingWeights Sampling weights
 #' @param CensoringPatterns Censoring patterns
 #' @param nPatterns Number of user-defined censoring patterns
@@ -199,9 +128,9 @@ Hazard <- function(formula, statefrom, stateto, multistatemodels, family = c("ex
 #' @examples
 #' CensoringPatterns <- matrix(c(3, 1, 0, 1, 0, 0), nrow=1, ncol=6)
 #' model <- multistatemodel(hazard = c(h12, h23, h24, h45), data = d[[1]], SamplingWeights = d[[2]],
-#' CensoringPatterns = CensoringPatterns, nPatterns = 1, multistatemodels =multistatemodels)
+#' CensoringPatterns = CensoringPatterns, nPatterns = 1)
 
-multistatemodel <- function(hazard, data, multistatemodels,
+multistatemodel <- function(hazard, data,
                             SamplingWeights=NULL, CensoringPatterns=NULL, nPatterns=NULL, verbose = FALSE) {
 
   if (!is.data.frame(data)) {
@@ -231,7 +160,6 @@ multistatemodel <- function(hazard, data, multistatemodels,
 #' calibrate to the MLE of a Markov surrogate.
 #'
 #' @param model A model created in the multistatemodel function
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param constraints Constraints on model parameters
 #' @param surrogate_constraints Surrogate constraints
 #' @param surrogate_parameters Surrogate parameters
@@ -240,10 +168,10 @@ multistatemodel <- function(hazard, data, multistatemodels,
 #' @export
 #'
 #' @examples
-#' initialize_parameters(model=model, multistatemodels = multistatemodels)
-initialize_parameters <- function(model, multistatemodels, constraints = NULL, surrogate_constraints = NULL, surrogate_parameters=NULL, crude=FALSE) {
+#' initialize_parameters(model=model)
+initialize_parameters <- function(model, constraints = NULL, surrogate_constraints = NULL, surrogate_parameters=NULL, crude=FALSE) {
 
-  multistatemodels$`initialize_parameters!`(model, constraints = constraints, surrogate_constraints = surrogate_constraints, surrogate_parameters=surrogate_parameters, crude=crude)
+  multistatemodels_env$`initialize_parameters!`(model, constraints = constraints, surrogate_constraints = surrogate_constraints, surrogate_parameters=surrogate_parameters, crude=crude)
 
 }
 
@@ -251,7 +179,6 @@ initialize_parameters <- function(model, multistatemodels, constraints = NULL, s
 #' Fit a Markov surrogate model
 #'
 #' @param model A model created in the multistatemodel function
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param surrogate_parameters Surrogate parameters
 #' @param surrogate_constraints Surrogate constraints on model parameters
 #' @param crude_inits logical; Defaults to TRUE
@@ -261,10 +188,10 @@ initialize_parameters <- function(model, multistatemodels, constraints = NULL, s
 #' @export
 #'
 #' @examples
-#' model_fitted_surrogate <- fit_surrogate(model=model, multistatemodels=multistatemodels)
-fit_surrogate <- function(model, multistatemodels, surrogate_parameters = NULL, surrogate_constraints = NULL, crude_inits = TRUE, verbose = TRUE) {
+#' model_fitted_surrogate <- fit_surrogate(model=model)
+fit_surrogate <- function(model, surrogate_parameters = NULL, surrogate_constraints = NULL, crude_inits = TRUE, verbose = TRUE) {
 
-  multistatemodels$fit_surrogate(model, surrogate_parameters = surrogate_parameters, surrogate_constraints = surrogate_constraints, crude_inits = crude_inits, verbose = verbose)
+  multistatemodels_env$fit_surrogate(model, surrogate_parameters = surrogate_parameters, surrogate_constraints = surrogate_constraints, crude_inits = crude_inits, verbose = verbose)
 
 }
 
@@ -272,7 +199,6 @@ fit_surrogate <- function(model, multistatemodels, surrogate_parameters = NULL, 
 #' Fit a multistate model
 #'
 #' @param model A model created in the multistatemodel function
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param verbose logical; print messages, defaults to TRUE
 #' @param compute_vcov logical; compute variance-covariance matrix, defaults to TRUE
 #' @param constraints constraints on model parameters
@@ -302,21 +228,21 @@ fit_surrogate <- function(model, multistatemodels, surrogate_parameters = NULL, 
 #' @export
 #'
 #' @examples
-#' model_fitted <- fit(model, multistatemodels = multistatemodels, tol=1e-3, ess_target_initial=500)
-fit <- function(model, multistatemodels, verbose=TRUE, compute_vcov=TRUE, constraints = NULL,
+#' model_fitted <- fit(model, tol=1e-3, ess_target_initial=500)
+fit <- function(model, verbose=TRUE, compute_vcov=TRUE, constraints = NULL,
                 optimize_surrogate=TRUE, surrogate_constraints = NULL, surrogate_parameters = NULL, maxiter=200, tol=1e-3,
                 alpha=0.05, gamma=0.05, kappa=4/3, ess_target_initial = 100, MaxSamplingEffort=20, npaths_additional = 10,
                 return_ConvergenceRecords = TRUE, return_ProposedPaths = FALSE) {
 
-  type <- juliaCall("typeof", model)[1]
+  type <- JuliaConnectoR::juliaCall("typeof", model)[1]
 
   if (type %in% c("MultistateModels.MultistateMarkovModelCensored", "MultistateModels.MultistateMarkovModel", "MultistateModels.MultistateModel")) {
 
-    multistatemodels$fit(model, verbose = verbose, compute_vcov = compute_vcov, constraints = constraints)
+    multistatemodels_env$fit(model, verbose = verbose, compute_vcov = compute_vcov, constraints = constraints)
 
   } else {
 
-    multistatemodels$fit(model, optimize_surrogate = optimize_surrogate, constraints = constraints, surrogate_constraints = surrogate_constraints, surrogate_parameters = surrogate_parameters,
+    multistatemodels_env$fit(model, optimize_surrogate = optimize_surrogate, constraints = constraints, surrogate_constraints = surrogate_constraints, surrogate_parameters = surrogate_parameters,
                          maxiter=JuliaConnectoR::juliaCall("Int", maxiter), α=alpha, γ=gamma, κ=kappa, ess_target_initial = JuliaConnectoR::juliaCall("Int", ess_target_initial),
                          MaxSamplingEffort = JuliaConnectoR::juliaCall("Int", MaxSamplingEffort), npaths_additional = JuliaConnectoR::juliaCall("Int", npaths_additional),
                          return_ConvergenceRecords=return_ConvergenceRecords, return_ProposedPaths=return_ProposedPaths, compute_vcov=compute_vcov, verbose=verbose)
@@ -334,7 +260,6 @@ fit <- function(model, multistatemodels, verbose=TRUE, compute_vcov=TRUE, constr
 #' where L is the likelihood and k is the number of consumed degrees of freedom.
 #'
 #' @param model_fitted A fitted multistate models object
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param estimate_likelihood logical; whether to estimate the log-likelihood, defaults to TRUE.
 #' @param min_ess minimum effective sample size per subject, defaults to 100.
 #' @param loglik value of the log-likelihood to use, if provided.
@@ -343,14 +268,14 @@ fit <- function(model, multistatemodels, verbose=TRUE, compute_vcov=TRUE, constr
 #' @export
 #'
 #' @examples
-#' aic(model_fitted=model_fitted, multistatemodels=multistatemodels)
-aic <- function(model_fitted, multistatemodels, estimate_likelihood = TRUE, min_ess=100, loglik=NULL) {
+#' aic(model_fitted=model_fitted)
+aic <- function(model_fitted, estimate_likelihood = TRUE, min_ess=100, loglik=NULL) {
 
   if (!JuliaConnectoR::juliaLet("isa(model_fitted, MultistateModels.MultistateModelFitted)", model_fitted = model_fitted)) {
     stop("Fitted model of type MultistateModels.MultistateModelFitted must be provided")
   }
 
-  multistatemodels$aic(model_fitted, estimate_likelihood = estimate_likelihood, min_ess = JuliaConnectoR::juliaCall("Int",min_ess), loglik=loglik)
+  multistatemodels_env$aic(model_fitted, estimate_likelihood = estimate_likelihood, min_ess = JuliaConnectoR::juliaCall("Int",min_ess), loglik=loglik)
 
 }
 
@@ -361,7 +286,6 @@ aic <- function(model_fitted, multistatemodels, estimate_likelihood = TRUE, min_
 #' where L is the likelihood and k is the number of consumed degrees of freedom.
 #'
 #' @param model_fitted A fitted multistate models object
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param estimate_likelihood logical; whether to estimate the log-likelihood, defaults to TRUE.
 #' @param min_ess minimum effective sample size per subject, defaults to 100.
 #' @param loglik value of the log-likelihood to use, if provided.
@@ -370,14 +294,14 @@ aic <- function(model_fitted, multistatemodels, estimate_likelihood = TRUE, min_
 #' @export
 #'
 #' @examples
-#' bic(model_fitted=model_fitted, multistatemodels=multistatemodels)
-bic <- function(model_fitted, multistatemodels, estimate_likelihood = TRUE, min_ess=100, loglik=NULL) {
+#' bic(model_fitted=model_fitted)
+bic <- function(model_fitted, estimate_likelihood = TRUE, min_ess=100, loglik=NULL) {
 
   if (!JuliaConnectoR::juliaLet("isa(model_fitted, MultistateModels.MultistateModelFitted)", model_fitted = model_fitted)) {
     stop("Fitted model of type MultistateModels.MultistateModelFitted must be provided")
   }
 
-  multistatemodels$bic(model_fitted, estimate_likelihood = estimate_likelihood, min_ess = JuliaConnectoR::juliaCall("Int",min_ess), loglik=loglik)
+  multistatemodels_env$bic(model_fitted, estimate_likelihood = estimate_likelihood, min_ess = JuliaConnectoR::juliaCall("Int",min_ess), loglik=loglik)
 
 }
 
@@ -388,21 +312,20 @@ bic <- function(model_fitted, multistatemodels, estimate_likelihood = TRUE, min_
 #'
 #'
 #' @param model_fitted A fitted multistate models object
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #'
 #' @return A Julia environment with status, candidate solution, algorithm,
 #' convergence records, and work counters
 #' @export
 #'
 #' @examples
-#' get_ConvergenceRecords(model_fitted=model_fitted, multistatemodels=multistatemodels)
-get_ConvergenceRecords <- function(model_fitted, multistatemodels) {
+#' get_ConvergenceRecords(model_fitted=model_fitted)
+get_ConvergenceRecords <- function(model_fitted) {
 
   if (!JuliaConnectoR::juliaLet("isa(model_fitted, MultistateModels.MultistateModelFitted)", model_fitted = model_fitted)) {
     stop("Fitted model of type MultistateModels.MultistateModelFitted must be provided")
   }
 
-  multistatemodels$get_ConvergenceRecords(model_fitted)
+  multistatemodels_env$get_ConvergenceRecords(model_fitted)
 
 }
 
@@ -413,7 +336,6 @@ get_ConvergenceRecords <- function(model_fitted, multistatemodels) {
 #'
 #'
 #' @param model_fitted A fitted multistate models object
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param ll string; one of "loglik" (default) for the observed data log-likelihood or
 #' "subj_lml" for log marginal likelihood at the subject level
 #'
@@ -421,8 +343,8 @@ get_ConvergenceRecords <- function(model_fitted, multistatemodels) {
 #' @export
 #'
 #' @examples
-#' get_loglik(model_fitted=model_fitted, multistatemodels=multistatemodels)
-get_loglik <- function(model_fitted, multistatemodels, ll="loglik") {
+#' get_loglik(model_fitted=model_fitted)
+get_loglik <- function(model_fitted, ll="loglik") {
 
   if (!JuliaConnectoR::juliaLet("isa(model_fitted, MultistateModels.MultistateModelFitted)", model_fitted = model_fitted)) {
     stop("Fitted model of type MultistateModels.MultistateModelFitted must be provided")
@@ -432,7 +354,7 @@ get_loglik <- function(model_fitted, multistatemodels, ll="loglik") {
     stop("ll must be either 'loglik' or 'subj_lml'")
   }
 
-  multistatemodels$get_loglik(model_fitted, ll=ll)
+  multistatemodels_env$get_loglik(model_fitted, ll=ll)
 
 }
 
@@ -443,20 +365,19 @@ get_loglik <- function(model_fitted, multistatemodels, ll="loglik") {
 #'
 #'
 #' @param model_fitted A fitted multistate models object
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #'
 #' @return A matrix of model parameters
 #' @export
 #'
 #' @examples
-#' get_parameters(model_fitted=model_fitted, multistatemodels=multistatemodels)
-get_parameters <- function(model_fitted, multistatemodels) {
+#' get_parameters(model_fitted=model_fitted)
+get_parameters <- function(model_fitted) {
 
   if (!JuliaConnectoR::juliaLet("isa(model_fitted, MultistateModels.MultistateModelFitted)", model_fitted = model_fitted)) {
     stop("Fitted model of type MultistateModels.MultistateModelFitted must be provided")
   }
 
-  pars <- multistatemodels$get_parameters(model_fitted)
+  pars <- multistatemodels_env$get_parameters(model_fitted)
   pars_list <- JuliaConnectoR::juliaGet(JuliaConnectoR::juliaCall("Tuple", pars))
 
   matrix(unlist(pars_list), nrow=length(pars_list), byrow=T)
@@ -470,20 +391,19 @@ get_parameters <- function(model_fitted, multistatemodels) {
 #'
 #'
 #' @param model_fitted A fitted multistate models object
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #'
 #' @return A matrix with parameter names as strings
 #' @export
 #'
 #' @examples
-#' get_parnames(model_fitted=model_fitted, multistatemodels=multistatemodels)
-get_parnames <- function(model_fitted, multistatemodels) {
+#' get_parnames(model_fitted=model_fitted)
+get_parnames <- function(model_fitted) {
 
   if (!JuliaConnectoR::juliaLet("isa(model_fitted, MultistateModels.MultistateModelFitted)", model_fitted = model_fitted)) {
     stop("Fitted model of type MultistateModels.MultistateModelFitted must be provided")
   }
 
-  parnames <- multistatemodels$get_parnames(model_fitted)
+  parnames <- multistatemodels_env$get_parnames(model_fitted)
   parnames_list <- JuliaConnectoR::juliaGet(JuliaConnectoR::juliaCall("Tuple", parnames))
 
   matrix(as.character(unlist(parnames_list)), nrow=length(parnames_list), byrow=T)
@@ -497,20 +417,19 @@ get_parnames <- function(model_fitted, multistatemodels) {
 #'
 #'
 #' @param model_fitted A fitted multistate models object
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #'
 #' @return Variance-covariance matrix
 #' @export
 #'
 #' @examples
-#' get_vcov(model_fitted=model_fitted, multistatemodels=multistatemodels)
-get_vcov <- function(model_fitted, multistatemodels) {
+#' get_vcov(model_fitted=model_fitted)
+get_vcov <- function(model_fitted) {
 
   if (!JuliaConnectoR::juliaLet("isa(model_fitted, MultistateModels.MultistateModelFitted)", model_fitted = model_fitted)) {
     stop("Fitted model of type MultistateModels.MultistateModelFitted must be provided")
   }
 
-  multistatemodels$get_vcov(model_fitted)
+  multistatemodels_env$get_vcov(model_fitted)
 
 }
 
@@ -519,16 +438,15 @@ get_vcov <- function(model_fitted, multistatemodels) {
 #' @param cons string or vector of strings, name of constraints
 #' @param lcons lcons
 #' @param ucons ucons
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #'
 #' @return A Julia environment with a named Tuple of constraints
 #' @export
 #'
 #' @examples
-#' constraints_weibull = make_constraints(cons = "h12_shape", lcons = 0, ucons = 0, ultistatemodels=multistatemodels)
-#' model_fitted=fit(model=model, multistatemodels=multistatemodels, constraints=constraints_weibull)
+#' constraints_weibull = make_constraints(cons = "h12_shape", lcons = 0, ucons = 0)
+#' model_fitted=fit(model=model, constraints=constraints_weibull)
 
-make_constraints <- function(cons, lcons, ucons, multistatemodels) {
+make_constraints <- function(cons, lcons, ucons) {
 
   if((length(cons) != length(ucons)) | (length(cons) != length(lcons)) | (length(ucons) != length(lcons))) {
     stop("cons, lcons, and ucons must all be the same length")
@@ -538,11 +456,11 @@ make_constraints <- function(cons, lcons, ucons, multistatemodels) {
     cons <- JuliaConnectoR::juliaEval(paste0("vec([:(", cons, ";)])"))
     lcons <- JuliaConnectoR::juliaCall("float", JuliaConnectoR::juliaEval(paste0("vec([", lcons, "])")))
     ucons <- JuliaConnectoR::juliaCall("float", JuliaConnectoR::juliaEval(paste0("vec([", ucons, "])")))
-    multistatemodels$make_constraints(cons = cons, lcons = lcons, ucons = ucons)
+    multistatemodels_env$make_constraints(cons = cons, lcons = lcons, ucons = ucons)
   } else {
     cons <- paste0(":(", cons, ")", collapse = ",")
     cons <- paste0("vec([", cons, "])")
-    multistatemodels$make_constraints(cons=JuliaConnectoR::juliaEval(cons), lcons=lcons, ucons = ucons)
+    multistatemodels_env$make_constraints(cons=JuliaConnectoR::juliaEval(cons), lcons=lcons, ucons = ucons)
   }
 
 }
@@ -557,22 +475,21 @@ make_constraints <- function(cons, lcons, ucons, multistatemodels) {
 #' @param t time or vector of times
 #' @param model multistate model
 #' @param hazard string specifying the hazard, e.g., "h12" for the hazard for transitioning from state 1 to state 2.
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param subj subject id
 #'
 #' @return An integer or vector of integers with the hazard at the specified time(s)
 #' @export
 #'
 #' @examples
-#' compute_hazard(t=2, model=model, hazard="h12", multistatemodels=multistatemodels)
-compute_hazard <- function(t, model, hazard, multistatemodels, subj=1) {
+#' compute_hazard(t=2, model=model, hazard="h12")
+compute_hazard <- function(t, model, hazard, subj=1) {
 
   hazards <- NULL
 
   hazard <- paste0(":", hazard)
 
   for (i in 1:length(t)) {
-    hazards <- append(hazards, multistatemodels$compute_hazard(t[i], model, JuliaConnectoR::juliaEval(hazard), JuliaConnectoR::juliaCall("Int", subj))[1])
+    hazards <- append(hazards, multistatemodels_env$compute_hazard(t[i], model, JuliaConnectoR::juliaEval(hazard), JuliaConnectoR::juliaCall("Int", subj))[1])
   }
 
   return(hazards)
@@ -589,15 +506,14 @@ compute_hazard <- function(t, model, hazard, multistatemodels, subj=1) {
 #' @param tstop stopping times
 #' @param model multistate model
 #' @param hazard string specifying the hazard, e.g., "h12" for the hazard for transitioning from state 1 to state 2.
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param subj subject id
 #'
 #' @return An integer with the cumulative hazard over (tsart, tstop)
 #' @export
 #'
 #' @examples
-#' compute_cumulative_hazard(tstart=2, tstop=3, model=model, hazard="h12", multistatemodels=multistatemodels)
-compute_cumulative_hazard <- function(tstart, tstop, model, hazard, multistatemodels, subj = 1) {
+#' compute_cumulative_hazard(tstart=2, tstop=3, model=model, hazard="h12")
+compute_cumulative_hazard <- function(tstart, tstop, model, hazard, subj = 1) {
 
   if (length(tstart) != length(tstop)) {
     stop("tstart and tstop must be the same length")
@@ -607,7 +523,7 @@ compute_cumulative_hazard <- function(tstart, tstop, model, hazard, multistatemo
   hazard <- paste0(":", hazard)
 
   for (i in 1:length(tstart)) {
-    hazards <- append(hazards, multistatemodels$compute_cumulative_hazard(tstart[i], tstop[i], model, JuliaConnectoR::juliaEval(hazard), JuliaConnectoR::juliaCall("Int", subj))[1])
+    hazards <- append(hazards, multistatemodels_env$compute_cumulative_hazard(tstart[i], tstop[i], model, JuliaConnectoR::juliaEval(hazard), JuliaConnectoR::juliaCall("Int", subj))[1])
   }
 
   return(hazards)
@@ -623,17 +539,16 @@ compute_cumulative_hazard <- function(tstart, tstop, model, hazard, multistatemo
 #' Require that the minimum effective sample size per subject is greater than min_ess.
 #'
 #' @param model multistate model
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param min_ess minimum effective sample size, defaults to 100.
 #'
 #' @return A Julia environment with a named Tuple
 #' @export
 #'
 #' @examples
-#' estimate_loglik(model=model, multistatemodels=multistatemodels)
-estimate_loglik <- function(model, multistatemodels, min_ess = 100) {
+#' estimate_loglik(model=model)
+estimate_loglik <- function(model, min_ess = 100) {
 
-  multistatemodels$estimate_loglik(model, min_ess = JuliaConnectoR::juliaCall("Int", min_ess))
+  multistatemodels_env$estimate_loglik(model, min_ess = JuliaConnectoR::juliaCall("Int", min_ess))
 
 }
 
@@ -645,7 +560,6 @@ estimate_loglik <- function(model, multistatemodels, min_ess = 100) {
 #'
 #'
 #' @param model multistate model
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param min_ess minimum effective sample size, defaults to 100.
 #' @param paretosmooth logical; pareto smooth importance weights, defaults to TRUE unless min_ess < 25.
 #' @param return_logliks logical; defaults to FALSE
@@ -654,10 +568,10 @@ estimate_loglik <- function(model, multistatemodels, min_ess = 100) {
 #' @export
 #'
 #' @examples
-#' draw_paths(model=model, multistatemodels = multistatemodels)
-draw_paths <- function(model, multistatemodels, min_ess = 100, paretosmooth=TRUE, return_logliks = FALSE) {
+#' draw_paths(model=model)
+draw_paths <- function(model, min_ess = 100, paretosmooth=TRUE, return_logliks = FALSE) {
 
-  multistatemodels$draw_paths(model, min_ess = JuliaConnectoR::juliaCall("Int", min_ess), paretosmooth = paretosmooth, return_logliks = return_logliks)
+  multistatemodels_env$draw_paths(model, min_ess = JuliaConnectoR::juliaCall("Int", min_ess), paretosmooth = paretosmooth, return_logliks = return_logliks)
 
 }
 
@@ -670,7 +584,6 @@ draw_paths <- function(model, multistatemodels, min_ess = 100, paretosmooth=TRUE
 #'
 #' @param t time or a vector of times
 #' @param model multistate model
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param subj subject id
 #'
 #' @return A matrix with the cumulative incidence where columns represent each
@@ -678,10 +591,10 @@ draw_paths <- function(model, multistatemodels, min_ess = 100, paretosmooth=TRUE
 #' @export
 #'
 #' @examples
-#' cumulative_incidence(t=2, model=model, multistatemodels=multistatemodels)
-cumulative_incidence <- function(t, model, multistatemodels, subj=1) {
+#' cumulative_incidence(t=2, model=model)
+cumulative_incidence <- function(t, model, subj=1) {
 
-  multistatemodels$cumulative_incidence(t, model, JuliaConnectoR::juliaCall("Int", subj))
+  multistatemodels_env$cumulative_incidence(t, model, JuliaConnectoR::juliaCall("Int", subj))
 
 }
 
@@ -692,15 +605,14 @@ cumulative_incidence <- function(t, model, multistatemodels, subj=1) {
 #' Copies newvalues to model.parameters.
 #'
 #' @param model multistate model
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param newvalues A list, each element of the list is new parameters for each hazard
 #'
 #' @export
 #'
 #' @examples
-#' set_parameters(model, multistatemodels, newvalues = list(h12 = c(log(1.5), log(1)),
+#' set_parameters(model, newvalues = list(h12 = c(log(1.5), log(1)),
 #' h23=c(log(2/3), log(1)), h24=c(log(1), log(1.25)), h45=c(log(1), log(1.25))))
-set_parameters <- function(model, multistatemodels, newvalues) {
+set_parameters <- function(model, newvalues) {
 
   values <- NULL
 
@@ -719,7 +631,7 @@ set_parameters <- function(model, multistatemodels, newvalues) {
 
 
 
-  multistatemodels$`set_parameters!`(model, JuliaConnectoR::juliaCall("Tuple", JuliaConnectoR::juliaEval(values)))
+  multistatemodels_env$`set_parameters!`(model, JuliaConnectoR::juliaCall("Tuple", JuliaConnectoR::juliaEval(values)))
 
 }
 
@@ -732,7 +644,6 @@ set_parameters <- function(model, multistatemodels, newvalues) {
 #' If paths = FALSE (the default), continuous-time sample paths are not returned.
 #'
 #' @param model multistate model
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param nsim number of sample paths to simulate
 #' @param data logical; if TRUE then return discretely observed sample paths
 #' @param paths logical; if FALSE then continuous-time sample paths not returned
@@ -743,10 +654,10 @@ set_parameters <- function(model, multistatemodels, newvalues) {
 #' @export
 #'
 #' @examples
-#' simulate(model=model, multistatemodels=multistatemodels)
-simulate <- function(model, multistatemodels, nsim=1, data=TRUE, paths=FALSE, delta_u = sqrt(.Machine$double.eps), delta_t = sqrt(.Machine$double.eps)) {
+#' simulate(model=model)
+simulate <- function(model, nsim=1, data=TRUE, paths=FALSE, delta_u = sqrt(.Machine$double.eps), delta_t = sqrt(.Machine$double.eps)) {
 
-  sim_dat <- multistatemodels$simulate(model, nsim = JuliaConnectoR::juliaCall("Int", nsim), data=data, paths=paths, delta_u=delta_u, delta_t=delta_t)
+  sim_dat <- multistatemodels_env$simulate(model, nsim = JuliaConnectoR::juliaCall("Int", nsim), data=data, paths=paths, delta_u=delta_u, delta_t=delta_t)
   as.data.frame(sim_dat[[1]])
 
 }
@@ -755,7 +666,6 @@ simulate <- function(model, multistatemodels, nsim=1, data=TRUE, paths=FALSE, de
 #' Summary of model output
 #'
 #' @param model_fitted fitted multistate models object
-#' @param multistatemodels Loaded multistatemodels Julia environment
 #' @param confidence_level confidence level of the confidence intervals, defaults to 0.95
 #' @param estimate_likelihood logical; estimate likelihood, defaults to FALSE
 #' @param min_ess minimum effective sample size, defaults to 100.
@@ -766,10 +676,10 @@ simulate <- function(model, multistatemodels, nsim=1, data=TRUE, paths=FALSE, de
 #' @export
 #'
 #' @examples
-#' model_summary(model_fitted=model_fitted, multistatemodels=multistatemodels, estimate_likelihood=TRUE)
-model_summary <- function(model_fitted, multistatemodels, confidence_level = 0.95, estimate_likelihood=FALSE, min_ess = 100) {
+#' model_summary(model_fitted=model_fitted, estimate_likelihood=TRUE)
+model_summary <- function(model_fitted, confidence_level = 0.95, estimate_likelihood=FALSE, min_ess = 100) {
 
-  multistatemodels$summary(model_fitted, confidence_level = confidence_level, estimate_likelihood=estimate_likelihood, min_ess = JuliaConnectoR::juliaCall("Int", min_ess))
+  multistatemodels_env$summary(model_fitted, confidence_level = confidence_level, estimate_likelihood=estimate_likelihood, min_ess = JuliaConnectoR::juliaCall("Int", min_ess))
 
 }
 
