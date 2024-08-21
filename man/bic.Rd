@@ -4,18 +4,10 @@
 \alias{bic}
 \title{BIC}
 \usage{
-bic(
-  model_fitted,
-  multistatemodels,
-  estimate_likelihood = TRUE,
-  min_ess = 100,
-  loglik = NULL
-)
+bic(model_fitted, estimate_likelihood = TRUE, min_ess = 100, loglik = NULL)
 }
 \arguments{
 \item{model_fitted}{A fitted multistate models object}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
 
 \item{estimate_likelihood}{logical; whether to estimate the log-likelihood, defaults to TRUE.}
 
@@ -31,5 +23,5 @@ Bayesian Information Criterion, defined as -2\emph{log(L) + k}log(n),
 where L is the likelihood and k is the number of consumed degrees of freedom.
 }
 \examples{
-bic(model_fitted=model_fitted, multistatemodels=multistatemodels)
+bic(model_fitted=model_fitted)
 }

@@ -4,16 +4,10 @@
 \alias{collapse_data}
 \title{Collapse subjects and recompute sampling weights}
 \usage{
-collapse_data(
-  dat,
-  multistatemodels,
-  SamplingWeights = rep(1, length(unique(dat$id)))
-)
+collapse_data(dat, SamplingWeights = rep(1, length(unique(dat$id))))
 }
 \arguments{
 \item{dat}{A data frame}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
 
 \item{SamplingWeights}{Sampling weights, defaults to 1 for each id in the data}
 }
@@ -26,9 +20,8 @@ Collapse subjects to create an internal representation of a
 dataset and optionally recompute a vector of sampling weights.
 }
 \examples{
-multistatemodels <- multistatemodels_load()
 df <- read.csv("~/derived_states_regen.csv")
-d <- collapse_data(df, multistatemodels)
+d <- collapse_data(df)
 \dontshow{
 JuliaConnectoR::stopJulia()
 }

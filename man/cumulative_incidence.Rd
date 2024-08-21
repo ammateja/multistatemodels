@@ -4,14 +4,12 @@
 \alias{cumulative_incidence}
 \title{Cumulative incidence}
 \usage{
-cumulative_incidence(t, model, multistatemodels, subj = 1)
+cumulative_incidence(t, model, subj = 1)
 }
 \arguments{
 \item{t}{time or a vector of times}
 
 \item{model}{multistate model}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
 
 \item{subj}{subject id}
 }
@@ -24,5 +22,5 @@ Compute the cumulative incidence for each possible transition as a function of t
 Assumes the subject starts their observation period at risk and saves cumulative incidence at the supplied vector of times, t.
 }
 \examples{
-cumulative_incidence(t=2, model=model, multistatemodels=multistatemodels)
+cumulative_incidence(t=2, model=model)
 }

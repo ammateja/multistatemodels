@@ -4,12 +4,10 @@
 \alias{get_parameters}
 \title{Get Parameters}
 \usage{
-get_parameters(model_fitted, multistatemodels)
+get_parameters(model_fitted)
 }
 \arguments{
 \item{model_fitted}{A fitted multistate models object}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
 }
 \value{
 A matrix of model parameters
@@ -18,5 +16,5 @@ A matrix of model parameters
 Return the model parameters
 }
 \examples{
-get_parameters(model_fitted=model_fitted, multistatemodels=multistatemodels)
+get_parameters(model_fitted=model_fitted)
 }

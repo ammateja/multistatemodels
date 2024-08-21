@@ -4,7 +4,7 @@
 \alias{compute_hazard}
 \title{Compute hazard}
 \usage{
-compute_hazard(t, model, hazard, multistatemodels, subj = 1)
+compute_hazard(t, model, hazard, subj = 1)
 }
 \arguments{
 \item{t}{time or vector of times}
@@ -12,8 +12,6 @@ compute_hazard(t, model, hazard, multistatemodels, subj = 1)
 \item{model}{multistate model}
 
 \item{hazard}{string specifying the hazard, e.g., "h12" for the hazard for transitioning from state 1 to state 2.}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
 
 \item{subj}{subject id}
 }
@@ -24,5 +22,5 @@ An integer or vector of integers with the hazard at the specified time(s)
 Compute the hazard at time t
 }
 \examples{
-compute_hazard(t=2, model=model, hazard="h12", multistatemodels=multistatemodels)
+compute_hazard(t=2, model=model, hazard="h12")
 }

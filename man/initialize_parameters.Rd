@@ -6,7 +6,6 @@
 \usage{
 initialize_parameters(
   model,
-  multistatemodels,
   constraints = NULL,
   surrogate_constraints = NULL,
   surrogate_parameters = NULL,
@@ -15,8 +14,6 @@ initialize_parameters(
 }
 \arguments{
 \item{model}{A model created in the multistatemodel function}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
 
 \item{constraints}{Constraints on model parameters}
 
@@ -31,5 +28,5 @@ Modify the parameter values in a MultistateProcess object,
 calibrate to the MLE of a Markov surrogate.
 }
 \examples{
-initialize_parameters(model=model, multistatemodels = multistatemodels)
+initialize_parameters(model=model)
 }

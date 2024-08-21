@@ -4,14 +4,7 @@
 \alias{compute_cumulative_hazard}
 \title{Compute cumulative hazard}
 \usage{
-compute_cumulative_hazard(
-  tstart,
-  tstop,
-  model,
-  hazard,
-  multistatemodels,
-  subj = 1
-)
+compute_cumulative_hazard(tstart, tstop, model, hazard, subj = 1)
 }
 \arguments{
 \item{tstart}{starting times}
@@ -22,8 +15,6 @@ compute_cumulative_hazard(
 
 \item{hazard}{string specifying the hazard, e.g., "h12" for the hazard for transitioning from state 1 to state 2.}
 
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
-
 \item{subj}{subject id}
 }
 \value{
@@ -33,5 +24,5 @@ An integer with the cumulative hazard over (tsart, tstop)
 Compute the cumulative hazard over (tstart,tstop).
 }
 \examples{
-compute_cumulative_hazard(tstart=2, tstop=3, model=model, hazard="h12", multistatemodels=multistatemodels)
+compute_cumulative_hazard(tstart=2, tstop=3, model=model, hazard="h12")
 }

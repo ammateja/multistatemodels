@@ -4,12 +4,10 @@
 \alias{set_parameters}
 \title{Set parameters}
 \usage{
-set_parameters(model, multistatemodels, newvalues)
+set_parameters(model, newvalues)
 }
 \arguments{
 \item{model}{multistate model}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
 
 \item{newvalues}{A list, each element of the list is new parameters for each hazard}
 }
@@ -18,6 +16,6 @@ Set model parameters given a vector of values.
 Copies newvalues to model.parameters.
 }
 \examples{
-set_parameters(model, multistatemodels, newvalues = list(h12 = c(log(1.5), log(1)),
+set_parameters(model, newvalues = list(h12 = c(log(1.5), log(1)),
 h23=c(log(2/3), log(1)), h24=c(log(1), log(1.25)), h45=c(log(1), log(1.25))))
 }

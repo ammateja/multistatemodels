@@ -6,7 +6,6 @@
 \usage{
 model_summary(
   model_fitted,
-  multistatemodels,
   confidence_level = 0.95,
   estimate_likelihood = FALSE,
   min_ess = 100
@@ -14,8 +13,6 @@ model_summary(
 }
 \arguments{
 \item{model_fitted}{fitted multistate models object}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
 
 \item{confidence_level}{confidence level of the confidence intervals, defaults to 0.95}
 
@@ -32,5 +29,5 @@ loglik, AIC, BIC, MCSE_loglik
 Summary of model output
 }
 \examples{
-model_summary(model_fitted=model_fitted, multistatemodels=multistatemodels, estimate_likelihood=TRUE)
+model_summary(model_fitted=model_fitted, estimate_likelihood=TRUE)
 }

@@ -4,12 +4,10 @@
 \alias{estimate_loglik}
 \title{Estimate log-likelihood}
 \usage{
-estimate_loglik(model, multistatemodels, min_ess = 100)
+estimate_loglik(model, min_ess = 100)
 }
 \arguments{
 \item{model}{multistate model}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
 
 \item{min_ess}{minimum effective sample size, defaults to 100.}
 }
@@ -21,5 +19,5 @@ Estimate the log marginal likelihood for a fitted multistate model.
 Require that the minimum effective sample size per subject is greater than min_ess.
 }
 \examples{
-estimate_loglik(model=model, multistatemodels=multistatemodels)
+estimate_loglik(model=model)
 }

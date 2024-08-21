@@ -4,12 +4,10 @@
 \alias{get_loglik}
 \title{Get Log-Likelihood}
 \usage{
-get_loglik(model_fitted, multistatemodels, ll = "loglik")
+get_loglik(model_fitted, ll = "loglik")
 }
 \arguments{
 \item{model_fitted}{A fitted multistate models object}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
 
 \item{ll}{string; one of "loglik" (default) for the observed data log-likelihood or
 "subj_lml" for log marginal likelihood at the subject level}
@@ -21,5 +19,5 @@ An integer with the log-likelihood at the MLE
 Return the log-likelihood at the maximum likelihood estimates.
 }
 \examples{
-get_loglik(model_fitted=model_fitted, multistatemodels=multistatemodels)
+get_loglik(model_fitted=model_fitted)
 }

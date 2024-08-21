@@ -6,7 +6,6 @@
 \usage{
 fit(
   model,
-  multistatemodels,
   verbose = TRUE,
   compute_vcov = TRUE,
   constraints = NULL,
@@ -27,8 +26,6 @@ fit(
 }
 \arguments{
 \item{model}{A model created in the multistatemodel function}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
 
 \item{verbose}{logical; print messages, defaults to TRUE}
 
@@ -77,5 +74,5 @@ A fitted multistate models environment
 Fit a multistate model
 }
 \examples{
-model_fitted <- fit(model, multistatemodels = multistatemodels, tol=1e-3, ess_target_initial=500)
+model_fitted <- fit(model, tol=1e-3, ess_target_initial=500)
 }

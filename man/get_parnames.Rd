@@ -4,12 +4,10 @@
 \alias{get_parnames}
 \title{Get Parameter Names}
 \usage{
-get_parnames(model_fitted, multistatemodels)
+get_parnames(model_fitted)
 }
 \arguments{
 \item{model_fitted}{A fitted multistate models object}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
 }
 \value{
 A matrix with parameter names as strings
@@ -18,5 +16,5 @@ A matrix with parameter names as strings
 Return the parameter names
 }
 \examples{
-get_parnames(model_fitted=model_fitted, multistatemodels=multistatemodels)
+get_parnames(model_fitted=model_fitted)
 }

@@ -4,18 +4,10 @@
 \alias{aic}
 \title{AIC}
 \usage{
-aic(
-  model_fitted,
-  multistatemodels,
-  estimate_likelihood = TRUE,
-  min_ess = 100,
-  loglik = NULL
-)
+aic(model_fitted, estimate_likelihood = TRUE, min_ess = 100, loglik = NULL)
 }
 \arguments{
 \item{model_fitted}{A fitted multistate models object}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
 
 \item{estimate_likelihood}{logical; whether to estimate the log-likelihood, defaults to TRUE.}
 
@@ -31,5 +23,5 @@ Akaike's Information Criterion, defined as -2\emph{log(L) + 2}k,
 where L is the likelihood and k is the number of consumed degrees of freedom.
 }
 \examples{
-aic(model_fitted=model_fitted, multistatemodels=multistatemodels)
+aic(model_fitted=model_fitted)
 }

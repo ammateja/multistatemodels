@@ -6,7 +6,6 @@
 \usage{
 fit_surrogate(
   model,
-  multistatemodels,
   surrogate_parameters = NULL,
   surrogate_constraints = NULL,
   crude_inits = TRUE,
@@ -15,8 +14,6 @@ fit_surrogate(
 }
 \arguments{
 \item{model}{A model created in the multistatemodel function}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
 
 \item{surrogate_parameters}{Surrogate parameters}
 
@@ -33,5 +30,5 @@ A Julia environment with a fitted Markov surrogate model
 Fit a Markov surrogate model
 }
 \examples{
-model_fitted_surrogate <- fit_surrogate(model=model, multistatemodels=multistatemodels)
+model_fitted_surrogate <- fit_surrogate(model=model)
 }
