@@ -4,11 +4,24 @@
 \alias{collapse_data}
 \title{Collapse subjects and recompute sampling weights}
 \usage{
+<<<<<<< HEAD
 collapse_data(dat, SamplingWeights = rep(1, length(unique(dat$id))))
+=======
+collapse_data(
+  dat,
+  multistatemodels,
+  SamplingWeights = rep(1, length(unique(dat$id)))
+)
+>>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }
 \arguments{
 \item{dat}{A data frame}
 
+<<<<<<< HEAD
+=======
+\item{multistatemodels}{Loaded multistatemodels Julia environment}
+
+>>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 \item{SamplingWeights}{Sampling weights, defaults to 1 for each id in the data}
 }
 \value{
@@ -21,7 +34,11 @@ dataset and optionally recompute a vector of sampling weights.
 }
 \examples{
 df <- read.csv("~/derived_states_regen.csv")
+<<<<<<< HEAD
 d <- collapse_data(df)
+=======
+d <- collapse_data(df, multistatemodels)
+>>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 \dontshow{
 JuliaConnectoR::stopJulia()
 }

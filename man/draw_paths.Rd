@@ -4,11 +4,26 @@
 \alias{draw_paths}
 \title{Draw paths}
 \usage{
+<<<<<<< HEAD
 draw_paths(model, min_ess = 100, paretosmooth = TRUE, return_logliks = FALSE)
+=======
+draw_paths(
+  model,
+  multistatemodels,
+  min_ess = 100,
+  paretosmooth = TRUE,
+  return_logliks = FALSE
+)
+>>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }
 \arguments{
 \item{model}{multistate model}
 
+<<<<<<< HEAD
+=======
+\item{multistatemodels}{Loaded multistatemodels Julia environment}
+
+>>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 \item{min_ess}{minimum effective sample size, defaults to 100.}
 
 \item{paretosmooth}{logical; pareto smooth importance weights, defaults to TRUE unless min_ess < 25.}
@@ -23,5 +38,9 @@ Draw sample paths conditional on the data.
 Require that the minimum effective sample size is greater than min_ess.
 }
 \examples{
+<<<<<<< HEAD
 draw_paths(model=model)
+=======
+draw_paths(model=model, multistatemodels = multistatemodels)
+>>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }

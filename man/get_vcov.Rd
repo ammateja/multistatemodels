@@ -4,10 +4,19 @@
 \alias{get_vcov}
 \title{Get Variance-Covariance Matrix}
 \usage{
+<<<<<<< HEAD
 get_vcov(model_fitted)
 }
 \arguments{
 \item{model_fitted}{A fitted multistate models object}
+=======
+get_vcov(model_fitted, multistatemodels)
+}
+\arguments{
+\item{model_fitted}{A fitted multistate models object}
+
+\item{multistatemodels}{Loaded multistatemodels Julia environment}
+>>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }
 \value{
 Variance-covariance matrix
@@ -16,5 +25,9 @@ Variance-covariance matrix
 Return the variance covariance matrix at the maximum likelihood estimate.
 }
 \examples{
+<<<<<<< HEAD
 get_vcov(model_fitted=model_fitted)
+=======
+get_vcov(model_fitted=model_fitted, multistatemodels=multistatemodels)
+>>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }

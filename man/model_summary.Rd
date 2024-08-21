@@ -6,6 +6,10 @@
 \usage{
 model_summary(
   model_fitted,
+<<<<<<< HEAD
+=======
+  multistatemodels,
+>>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
   confidence_level = 0.95,
   estimate_likelihood = FALSE,
   min_ess = 100
@@ -14,6 +18,11 @@ model_summary(
 \arguments{
 \item{model_fitted}{fitted multistate models object}
 
+<<<<<<< HEAD
+=======
+\item{multistatemodels}{Loaded multistatemodels Julia environment}
+
+>>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 \item{confidence_level}{confidence level of the confidence intervals, defaults to 0.95}
 
 \item{estimate_likelihood}{logical; estimate likelihood, defaults to FALSE}
@@ -29,5 +38,9 @@ loglik, AIC, BIC, MCSE_loglik
 Summary of model output
 }
 \examples{
+<<<<<<< HEAD
 model_summary(model_fitted=model_fitted, estimate_likelihood=TRUE)
+=======
+model_summary(model_fitted=model_fitted, multistatemodels=multistatemodels, estimate_likelihood=TRUE)
+>>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }
