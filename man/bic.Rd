@@ -4,26 +4,11 @@
 \alias{bic}
 \title{BIC}
 \usage{
-<<<<<<< HEAD
 bic(model_fitted, estimate_likelihood = TRUE, min_ess = 100, loglik = NULL)
-=======
-bic(
-  model_fitted,
-  multistatemodels,
-  estimate_likelihood = TRUE,
-  min_ess = 100,
-  loglik = NULL
-)
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }
 \arguments{
 \item{model_fitted}{A fitted multistate models object}
 
-<<<<<<< HEAD
-=======
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
-
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 \item{estimate_likelihood}{logical; whether to estimate the log-likelihood, defaults to TRUE.}
 
 \item{min_ess}{minimum effective sample size per subject, defaults to 100.}
@@ -38,9 +23,5 @@ Bayesian Information Criterion, defined as -2\emph{log(L) + k}log(n),
 where L is the likelihood and k is the number of consumed degrees of freedom.
 }
 \examples{
-<<<<<<< HEAD
 bic(model_fitted=model_fitted)
-=======
-bic(model_fitted=model_fitted, multistatemodels=multistatemodels)
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }

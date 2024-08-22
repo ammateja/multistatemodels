@@ -6,10 +6,6 @@
 \usage{
 simulate(
   model,
-<<<<<<< HEAD
-=======
-  multistatemodels,
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
   nsim = 1,
   data = TRUE,
   paths = FALSE,
@@ -20,11 +16,6 @@ simulate(
 \arguments{
 \item{model}{multistate model}
 
-<<<<<<< HEAD
-=======
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
-
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 \item{nsim}{number of sample paths to simulate}
 
 \item{data}{logical; if TRUE then return discretely observed sample paths}
@@ -44,9 +35,5 @@ If data = TRUE (the default) discretely observed sample paths are returned, poss
 If paths = FALSE (the default), continuous-time sample paths are not returned.
 }
 \examples{
-<<<<<<< HEAD
 simulate(model=model)
-=======
-simulate(model=model, multistatemodels=multistatemodels)
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }

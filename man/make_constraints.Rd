@@ -4,11 +4,7 @@
 \alias{make_constraints}
 \title{Make parameter constraints}
 \usage{
-<<<<<<< HEAD
 make_constraints(cons, lcons, ucons)
-=======
-make_constraints(cons, lcons, ucons, multistatemodels)
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }
 \arguments{
 \item{cons}{string or vector of strings, name of constraints}
@@ -16,11 +12,6 @@ make_constraints(cons, lcons, ucons, multistatemodels)
 \item{lcons}{lcons}
 
 \item{ucons}{ucons}
-<<<<<<< HEAD
-=======
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }
 \value{
 A Julia environment with a named Tuple of constraints
@@ -29,11 +20,6 @@ A Julia environment with a named Tuple of constraints
 Make parameter constraints
 }
 \examples{
-<<<<<<< HEAD
 constraints_weibull = make_constraints(cons = "h12_shape", lcons = 0, ucons = 0)
 model_fitted=fit(model=model, constraints=constraints_weibull)
-=======
-constraints_weibull = make_constraints(cons = "h12_shape", lcons = 0, ucons = 0, ultistatemodels=multistatemodels)
-model_fitted=fit(model=model, multistatemodels=multistatemodels, constraints=constraints_weibull)
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }

@@ -6,10 +6,6 @@
 \usage{
 fit(
   model,
-<<<<<<< HEAD
-=======
-  multistatemodels,
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
   verbose = TRUE,
   compute_vcov = TRUE,
   constraints = NULL,
@@ -31,11 +27,6 @@ fit(
 \arguments{
 \item{model}{A model created in the multistatemodel function}
 
-<<<<<<< HEAD
-=======
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
-
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 \item{verbose}{logical; print messages, defaults to TRUE}
 
 \item{compute_vcov}{logical; compute variance-covariance matrix, defaults to TRUE}
@@ -83,9 +74,5 @@ A fitted multistate models environment
 Fit a multistate model
 }
 \examples{
-<<<<<<< HEAD
 model_fitted <- fit(model, tol=1e-3, ess_target_initial=500)
-=======
-model_fitted <- fit(model, multistatemodels = multistatemodels, tol=1e-3, ess_target_initial=500)
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }

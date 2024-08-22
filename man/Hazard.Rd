@@ -26,11 +26,6 @@ Must be specified with "0 ~" on the left hand side.}
 
 \item{stateto}{Integer specifying the destination state}
 
-<<<<<<< HEAD
-=======
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
-
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 \item{family}{string; One of "exp" or "wei" for exponential or Weibull cause-specific
 baseline hazard functions, or "sp" for a semi-parametric spline basis for the
 baseline hazard (defaults to M-splines).}

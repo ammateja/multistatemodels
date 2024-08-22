@@ -45,7 +45,7 @@
     }
     else {
       stop("Julia setup incorrect.
-         Ensure Julia version >= 1.0 is properly installed.")
+         Ensure Julia version >= 1.10 is properly installed.")
     }
   }
   )

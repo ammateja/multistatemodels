@@ -4,19 +4,10 @@
 \alias{get_ConvergenceRecords}
 \title{Get Convergence Records}
 \usage{
-<<<<<<< HEAD
 get_ConvergenceRecords(model_fitted)
 }
 \arguments{
 \item{model_fitted}{A fitted multistate models object}
-=======
-get_ConvergenceRecords(model_fitted, multistatemodels)
-}
-\arguments{
-\item{model_fitted}{A fitted multistate models object}
-
-\item{multistatemodels}{Loaded multistatemodels Julia environment}
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }
 \value{
 A Julia environment with status, candidate solution, algorithm,
@@ -26,9 +17,5 @@ convergence records, and work counters
 Return the convergence records for the fit.
 }
 \examples{
-<<<<<<< HEAD
 get_ConvergenceRecords(model_fitted=model_fitted)
-=======
-get_ConvergenceRecords(model_fitted=model_fitted, multistatemodels=multistatemodels)
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 }

@@ -20,10 +20,5 @@ export(initialize_parameters)
 export(make_constraints)
 export(model_summary)
 export(multistatemodel)
-<<<<<<< HEAD
-=======
-export(multistatemodels_load)
-export(multistatemodels_setup)
->>>>>>> 58defaf854b74cbdc24e43f36f206de956a16d51
 export(set_parameters)
 export(simulate)
