@@ -18,6 +18,3 @@ An integer with the log-likelihood at the MLE
 \description{
 Return the log-likelihood at the maximum likelihood estimates.
 }
-\examples{
-get_loglik(model_fitted=model_fitted)
-}

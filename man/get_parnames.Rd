@@ -15,6 +15,3 @@ A matrix with parameter names as strings
 \description{
 Return the parameter names
 }
-\examples{
-get_parnames(model_fitted=model_fitted)
-}

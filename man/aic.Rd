@@ -22,6 +22,3 @@ An integer with calculated AIC
 Akaike's Information Criterion, defined as -2\emph{log(L) + 2}k,
 where L is the likelihood and k is the number of consumed degrees of freedom.
 }
-\examples{
-aic(model_fitted=model_fitted)
-}

@@ -12,16 +12,18 @@ fit(
   optimize_surrogate = TRUE,
   surrogate_constraints = NULL,
   surrogate_parameters = NULL,
-  maxiter = 200,
-  tol = 0.001,
-  alpha = 0.05,
-  gamma = 0.05,
-  kappa = 4/3,
-  ess_target_initial = 100,
-  MaxSamplingEffort = 20,
+  maxiter = 100,
+  tol = 0.01,
+  ascent_threshold = 0.1,
+  stopping_threshold = 0.1,
+  ess_increase = 2,
+  ess_target_initial = 50,
+  max_ess = 10000,
+  max_sampling_effort = 20,
   npaths_additional = 10,
-  return_ConvergenceRecords = TRUE,
-  return_ProposedPaths = FALSE
+  return_convergence_records = TRUE,
+  return_proposed_paths = FALSE,
+  vcov_threshold = TRUE
 )
 }
 \arguments{
@@ -40,39 +42,43 @@ proposing paths be set to the MLE? defaults to TRUE}
 
 \item{surrogate_parameters}{surrogate parameters}
 
-\item{maxiter}{maximum number of MCEM iterations, defaults to 200}
+\item{maxiter}{maximum number of MCEM iterations, defaults to 100}
 
 \item{tol}{tolerance for the change in the MLL, i.e., upper bound of the
-stopping rule to be ruled out, defaults to 1e-3}
+stopping rule to be ruled out, defaults to 1e-2}
 
-\item{alpha}{standard normal quantile for asymptotic lower bound for ascent,
-defaults to 0.05}
+\item{ascent_threshold}{standard normal quantile for asymptotic lower bound for ascent,
+defaults to 0.1}
 
-\item{gamma}{standard normal quantile for stopping the MCEM algorithm,
-defaults to 0.05}
+\item{stopping_threshold}{standard normal quantile for stopping the MCEM algorithm,
+defaults to 0.1}
 
-\item{kappa}{Inflation factor for target ESS per person, ESS_new = ESS_cur*kappa,
-defaults to 4/3}
+\item{ess_increase}{Inflation factor for target ESS per person, ESS_new = ESS_cur*ess_increase,
+defaults to 2}
 
 \item{ess_target_initial}{initial number of particles per participant for MCEM,
-defaults to 100}
+defaults to 50}
 
-\item{MaxSamplingEffort}{factor of the ESS at which to break the loop for sampling additional paths,
+\item{max_ess}{maximum ess after which the mcem is stopped for nonconvergence, defaults to 10000}
+
+\item{max_sampling_effort}{factor of the ESS at which to break the loop for sampling additional paths,
 defaults to 20}
 
 \item{npaths_additional}{increment for number of additional paths when augmenting the pool of paths,
 defaults to 10}
 
-\item{return_ConvergenceRecords}{logical; save history throughout the run, defaults to TRUE}
+\item{return_convergence_records}{logical; save history throughout the run, defaults to TRUE}
 
-\item{return_ProposedPaths}{logical; save latent paths and importance weights, defaults to FALSE}
+\item{return_proposed_paths}{logical; save latent paths and importance weights, defaults to FALSE}
+
+\item{vcov_threshold}{if true, the variance covariance matrix calculation only inverts singular values
+of the fisher information matrix that are greater than 1/sqrt(log(n) * k) where k is the number of parameters
+and n is the number of subjects in the dataset. otherwise, the absolute tolerance is set to the square root of eps().
+Defaults to TRUE}
 }
 \value{
 A fitted multistate models environment
 }
 \description{
 Fit a multistate model
-}
-\examples{
-model_fitted <- fit(model, tol=1e-3, ess_target_initial=500)
 }

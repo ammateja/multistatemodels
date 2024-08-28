@@ -23,6 +23,3 @@ An integer with the cumulative hazard over (tsart, tstop)
 \description{
 Compute the cumulative hazard over (tstart,tstop).
 }
-\examples{
-compute_cumulative_hazard(tstart=2, tstop=3, model=model, hazard="h12")
-}

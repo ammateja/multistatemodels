@@ -34,6 +34,3 @@ Simulate n data sets or collections of sample paths from a multistate model.
 If data = TRUE (the default) discretely observed sample paths are returned, possibly subject to measurement error.
 If paths = FALSE (the default), continuous-time sample paths are not returned.
 }
-\examples{
-simulate(model=model)
-}

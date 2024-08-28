@@ -18,6 +18,3 @@ A Julia environment with a named Tuple
 Estimate the log marginal likelihood for a fitted multistate model.
 Require that the minimum effective sample size per subject is greater than min_ess.
 }
-\examples{
-estimate_loglik(model=model)
-}

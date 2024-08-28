@@ -9,7 +9,6 @@ multistatemodel(
   data,
   SamplingWeights = NULL,
   CensoringPatterns = NULL,
-  nPatterns = NULL,
   verbose = FALSE
 )
 }
@@ -22,8 +21,6 @@ multistatemodel(
 
 \item{CensoringPatterns}{Censoring patterns}
 
-\item{nPatterns}{Number of user-defined censoring patterns}
-
 \item{verbose}{logical; print messages, defaults to FALSE}
 }
 \value{
@@ -31,9 +28,4 @@ A Julia MultistateModel environment that can be used for simulation and inferenc
 }
 \description{
 Construct a multistate model
-}
-\examples{
-CensoringPatterns <- matrix(c(3, 1, 0, 1, 0, 0), nrow=1, ncol=6)
-model <- multistatemodel(hazard = c(h12, h23, h24, h45), data = d[[1]], SamplingWeights = d[[2]],
-CensoringPatterns = CensoringPatterns, nPatterns = 1)
 }

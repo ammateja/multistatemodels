@@ -27,6 +27,3 @@ initialize_parameters(
 Modify the parameter values in a MultistateProcess object,
 calibrate to the MLE of a Markov surrogate.
 }
-\examples{
-initialize_parameters(model=model)
-}

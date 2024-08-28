@@ -15,6 +15,3 @@ A matrix of model parameters
 \description{
 Return the model parameters
 }
-\examples{
-get_parameters(model_fitted=model_fitted)
-}

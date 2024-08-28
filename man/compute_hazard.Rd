@@ -21,6 +21,3 @@ An integer or vector of integers with the hazard at the specified time(s)
 \description{
 Compute the hazard at time t
 }
-\examples{
-compute_hazard(t=2, model=model, hazard="h12")
-}

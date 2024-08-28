@@ -51,13 +51,3 @@ An environment with a Julia hazard
 Specify a parametric or semi-parametric baseline cause-specific
 hazard function.
 }
-\examples{
-h12 <- Hazard(formula = 0 ~ 1+mab, family = "sp", statefrom = 1, stateto=2,
-degree=1, knots=5/7)
-h23 <- Hazard(formula = 0 ~ 1+mab, family = "exp", statefrom = 2, stateto=3)
-h24 <- Hazard(formula = 0 ~ 1+mab, family = "exp", statefrom = 2, stateto=4)
-h45 <- Hazard(formula = 0 ~ 1+mab, family = "exp", statefrom = 4, stateto=5)
-\dontshow{
-JuliaConnectoR::stopJulia()
-}
-}

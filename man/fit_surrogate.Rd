@@ -29,6 +29,3 @@ A Julia environment with a fitted Markov surrogate model
 \description{
 Fit a Markov surrogate model
 }
-\examples{
-model_fitted_surrogate <- fit_surrogate(model=model)
-}

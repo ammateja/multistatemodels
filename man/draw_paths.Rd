@@ -22,6 +22,3 @@ A Julia environment with a named Tuple of sample paths
 Draw sample paths conditional on the data.
 Require that the minimum effective sample size is greater than min_ess.
 }
-\examples{
-draw_paths(model=model)
-}

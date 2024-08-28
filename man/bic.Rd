@@ -22,6 +22,3 @@ An integer with calculated BIC
 Bayesian Information Criterion, defined as -2\emph{log(L) + k}log(n),
 where L is the likelihood and k is the number of consumed degrees of freedom.
 }
-\examples{
-bic(model_fitted=model_fitted)
-}

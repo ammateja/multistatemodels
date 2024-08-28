@@ -8,12 +8,7 @@
     JuliaConnectoR::juliaEval('
           using MultistateModels
           using CSV
-          using DataFrames
-          using Distributions
-          using LinearAlgebra
-          using JLD2
-          using ArraysOfArrays
-          using Random')
+          using DataFrames')
     multistatemodels_env <- JuliaConnectoR::juliaImport("MultistateModels", all = F)
     assign("multistatemodels_env", multistatemodels_env, envir = topenv())
   },
@@ -23,22 +18,12 @@
        import Pkg
        Pkg.add(url = "https://github.com/fintzij/MultistateModels.jl.git")
        Pkg.add("CSV")
-       Pkg.add("DataFrames")
-       Pkg.add("Distributions")
-       Pkg.add("LinearAlgebra")
-       Pkg.add("JLD2")
-       Pkg.add("ArraysOfArrays")
-       Pkg.add("Random")')
+       Pkg.add("DataFrames")')
 
       JuliaConnectoR::juliaEval('
           using MultistateModels
           using CSV
-          using DataFrames
-          using Distributions
-          using LinearAlgebra
-          using JLD2
-          using ArraysOfArrays
-          using Random')
+          using DataFrames')
 
       multistatemodels_env <- JuliaConnectoR::juliaImport("MultistateModels", all = F)
       assign("multistatemodels_env", multistatemodels_env, envir = topenv())

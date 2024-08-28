@@ -28,6 +28,3 @@ loglik, AIC, BIC, MCSE_loglik
 \description{
 Summary of model output
 }
-\examples{
-model_summary(model_fitted=model_fitted, estimate_likelihood=TRUE)
-}

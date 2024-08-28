@@ -21,6 +21,3 @@ possible transition and rows represent t
 Compute the cumulative incidence for each possible transition as a function of time since state entry.
 Assumes the subject starts their observation period at risk and saves cumulative incidence at the supplied vector of times, t.
 }
-\examples{
-cumulative_incidence(t=2, model=model)
-}

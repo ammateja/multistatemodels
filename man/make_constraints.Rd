@@ -19,7 +19,3 @@ A Julia environment with a named Tuple of constraints
 \description{
 Make parameter constraints
 }
-\examples{
-constraints_weibull = make_constraints(cons = "h12_shape", lcons = 0, ucons = 0)
-model_fitted=fit(model=model, constraints=constraints_weibull)
-}

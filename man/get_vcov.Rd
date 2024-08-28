@@ -15,6 +15,3 @@ Variance-covariance matrix
 \description{
 Return the variance covariance matrix at the maximum likelihood estimate.
 }
-\examples{
-get_vcov(model_fitted=model_fitted)
-}

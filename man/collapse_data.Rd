@@ -19,10 +19,3 @@ is a vector of sampling weights
 Collapse subjects to create an internal representation of a
 dataset and optionally recompute a vector of sampling weights.
 }
-\examples{
-df <- read.csv("~/derived_states_regen.csv")
-d <- collapse_data(df)
-\dontshow{
-JuliaConnectoR::stopJulia()
-}
-}
