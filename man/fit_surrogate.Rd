@@ -29,3 +29,15 @@ A Julia environment with a fitted Markov surrogate model
 \description{
 Fit a Markov surrogate model
 }
+\examples{
+\donttest{
+h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+model_fitted_surr <- fit_surrogate(model = model_fit)
+\dontshow{
+JuliaConnectoR::stopJulia()
+}
+}
+}

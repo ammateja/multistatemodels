@@ -27,3 +27,15 @@ initialize_parameters(
 Modify the parameter values in a MultistateProcess object,
 calibrate to the MLE of a Markov surrogate.
 }
+\examples{
+\donttest{
+h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+model_fit <- initialize_parameters(model = model_fit)
+\dontshow{
+JuliaConnectoR::stopJulia()
+}
+}
+}

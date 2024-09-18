@@ -34,3 +34,15 @@ Simulate n data sets or collections of sample paths from a multistate model.
 If data = TRUE (the default) discretely observed sample paths are returned, possibly subject to measurement error.
 If paths = FALSE (the default), continuous-time sample paths are not returned.
 }
+\examples{
+\donttest{
+h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+d <- simulate(model = model_fit)
+\dontshow{
+JuliaConnectoR::stopJulia()
+}
+}
+}

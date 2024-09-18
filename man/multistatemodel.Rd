@@ -29,3 +29,14 @@ A Julia MultistateModel environment that can be used for simulation and inferenc
 \description{
 Construct a multistate model
 }
+\examples{
+\donttest{
+h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+\dontshow{
+JuliaConnectoR::stopJulia()
+}
+}
+}

@@ -32,7 +32,12 @@ check_data <- function(dat) {
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' d_collpased <- collapse_data(dat = illness_death_dat)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 collapse_data <- function(dat, SamplingWeights = rep(1, length(unique(dat$id)))) {
 
   df <- readr::format_csv(dat)
@@ -75,9 +80,16 @@ collapse_data <- function(dat, SamplingWeights = rep(1, length(unique(dat$id))))
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 Hazard <- function(formula, statefrom, stateto, family = c("exp", "wei", "sp"),
-                   degree=3, natural_spline=T, extrapolation="linear", monotone=0, knots=NULL,
+                   degree=3, natural_spline=TRUE, extrapolation="linear", monotone=0, knots=NULL,
                    boundaryknots=NULL) {
 
   if (!family %in% c("exp", "wei", "sp")) {
@@ -88,7 +100,10 @@ Hazard <- function(formula, statefrom, stateto, family = c("exp", "wei", "sp"),
   form <- JuliaConnectoR::juliaEval(paste0("@formula(", as.character(stats::terms(formula)[[2]]), as.character(stats::terms(formula)[[1]]), rhs, ")"))
 
   if (family == "sp") {
-    knots <- JuliaConnectoR::juliaEval(paste0("vec([", knots, "])"))
+
+    if (length(knots) == 1) {
+      knots <- JuliaConnectoR::juliaEval(paste0("vec([", knots, "])"))
+    }
 
     haz <- multistatemodels_env$Hazard(form, family, JuliaConnectoR::juliaCall("Int", statefrom), JuliaConnectoR::juliaCall("Int", stateto),
                                    degree = JuliaConnectoR::juliaCall("Int", degree), knots = knots, extrapolation = extrapolation, natural_spline = natural_spline,
@@ -114,7 +129,15 @@ Hazard <- function(formula, statefrom, stateto, family = c("exp", "wei", "sp"),
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 multistatemodel <- function(hazard, data,
                             SamplingWeights=NULL, CensoringPatterns=NULL, verbose = FALSE) {
 
@@ -154,7 +177,16 @@ multistatemodel <- function(hazard, data,
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' model_fit <- initialize_parameters(model = model_fit)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 initialize_parameters <- function(model, constraints = NULL, surrogate_constraints = NULL, surrogate_parameters=NULL, crude=FALSE) {
 
   #mod <- rlang::duplicate(model)
@@ -176,7 +208,16 @@ initialize_parameters <- function(model, constraints = NULL, surrogate_constrain
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' model_fitted_surr <- fit_surrogate(model = model_fit)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 fit_surrogate <- function(model, surrogate_parameters = NULL, surrogate_constraints = NULL, crude_inits = TRUE, verbose = TRUE) {
 
   multistatemodels_env$fit_surrogate(model, surrogate_parameters = surrogate_parameters, surrogate_constraints = surrogate_constraints, crude_inits = crude_inits, verbose = verbose)
@@ -221,7 +262,17 @@ fit_surrogate <- function(model, surrogate_parameters = NULL, surrogate_constrai
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' model_fitted <- fit(model = model_fit, verbose=TRUE, compute_vcov = TRUE, ess_target_initial = 50,
+#' ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 fit <- function(model, verbose=TRUE, compute_vcov=TRUE, constraints = NULL,
                 optimize_surrogate=TRUE, surrogate_constraints = NULL, surrogate_parameters = NULL, maxiter=100, tol=1e-2,
                 ascent_threshold=0.1, stopping_threshold=0.1, ess_increase=2, ess_target_initial = 50, max_ess=10000, max_sampling_effort=20, npaths_additional = 10,
@@ -261,7 +312,18 @@ fit <- function(model, verbose=TRUE, compute_vcov=TRUE, constraints = NULL,
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' model_fitted <- fit(model = model_fit, verbose=TRUE, compute_vcov = TRUE, ess_target_initial = 50,
+#' ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
+#' aic(model_fitted = model_fitted)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 aic <- function(model_fitted, estimate_likelihood = TRUE, min_ess=100, loglik=NULL) {
 
   if (!JuliaConnectoR::juliaLet("isa(model_fitted, MultistateModels.MultistateModelFitted)", model_fitted = model_fitted)) {
@@ -287,7 +349,18 @@ aic <- function(model_fitted, estimate_likelihood = TRUE, min_ess=100, loglik=NU
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' model_fitted <- fit(model = model_fit, verbose=TRUE, compute_vcov = TRUE, ess_target_initial = 50,
+#' ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
+#' bic(model_fitted = model_fitted)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 bic <- function(model_fitted, estimate_likelihood = TRUE, min_ess=100, loglik=NULL) {
 
   if (!JuliaConnectoR::juliaLet("isa(model_fitted, MultistateModels.MultistateModelFitted)", model_fitted = model_fitted)) {
@@ -311,7 +384,18 @@ bic <- function(model_fitted, estimate_likelihood = TRUE, min_ess=100, loglik=NU
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' model_fitted <- fit(model = model_fit, verbose=TRUE, compute_vcov = TRUE, ess_target_initial = 50,
+#' ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
+#' get_convergence_records(model_fitted=model_fitted)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 get_convergence_records <- function(model_fitted) {
 
   if (!JuliaConnectoR::juliaLet("isa(model_fitted, MultistateModels.MultistateModelFitted)", model_fitted = model_fitted)) {
@@ -336,7 +420,18 @@ get_convergence_records <- function(model_fitted) {
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' model_fitted <- fit(model = model_fit, verbose=TRUE, compute_vcov = TRUE, ess_target_initial = 50,
+#' ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
+#' get_loglik(model_fitted=model_fitted)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 get_loglik <- function(model_fitted, ll="loglik") {
 
   if (!JuliaConnectoR::juliaLet("isa(model_fitted, MultistateModels.MultistateModelFitted)", model_fitted = model_fitted)) {
@@ -363,7 +458,18 @@ get_loglik <- function(model_fitted, ll="loglik") {
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' model_fitted <- fit(model = model_fit, verbose=TRUE, compute_vcov = TRUE, ess_target_initial = 50,
+#' ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
+#' get_parameters(model_fitted=model_fitted)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 get_parameters <- function(model_fitted) {
 
   if (!JuliaConnectoR::juliaLet("isa(model_fitted, MultistateModels.MultistateModelFitted)", model_fitted = model_fitted)) {
@@ -389,7 +495,18 @@ get_parameters <- function(model_fitted) {
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' model_fitted <- fit(model = model_fit, verbose=TRUE, compute_vcov = TRUE, ess_target_initial = 50,
+#' ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
+#' get_parnames(model_fitted=model_fitted)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 get_parnames <- function(model_fitted) {
 
   if (!JuliaConnectoR::juliaLet("isa(model_fitted, MultistateModels.MultistateModelFitted)", model_fitted = model_fitted)) {
@@ -415,7 +532,18 @@ get_parnames <- function(model_fitted) {
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' model_fitted <- fit(model = model_fit, verbose=TRUE, compute_vcov = TRUE, ess_target_initial = 50,
+#' ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
+#' get_vcov(model_fitted=model_fitted)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 get_vcov <- function(model_fitted) {
 
   if (!JuliaConnectoR::juliaLet("isa(model_fitted, MultistateModels.MultistateModelFitted)", model_fitted = model_fitted)) {
@@ -436,7 +564,12 @@ get_vcov <- function(model_fitted) {
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' constraints_weibull <- make_constraints(cons = "h12_shape", lcons = 0, ucons = 0)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 make_constraints <- function(cons, lcons, ucons) {
 
   if((length(cons) != length(ucons)) | (length(cons) != length(lcons)) | (length(ucons) != length(lcons))) {
@@ -472,7 +605,16 @@ make_constraints <- function(cons, lcons, ucons) {
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' compute_hazard(t=0.5, model=model_fit, hazard = "h12")
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 compute_hazard <- function(t, model, hazard, subj=1) {
 
   hazards <- NULL
@@ -503,7 +645,16 @@ compute_hazard <- function(t, model, hazard, subj=1) {
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' compute_cumulative_hazard(tstart = 0, tstop =0.5, model=model_fit, hazard = "h12")
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 compute_cumulative_hazard <- function(tstart, tstop, model, hazard, subj = 1) {
 
   if (length(tstart) != length(tstop)) {
@@ -536,7 +687,16 @@ compute_cumulative_hazard <- function(tstart, tstop, model, hazard, subj = 1) {
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' estimate_loglik(model = model_fit)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 estimate_loglik <- function(model, min_ess = 100) {
 
   multistatemodels_env$estimate_loglik(model, min_ess = JuliaConnectoR::juliaCall("Int", min_ess))
@@ -559,7 +719,16 @@ estimate_loglik <- function(model, min_ess = 100) {
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' draw_paths(model = model_fit)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 draw_paths <- function(model, min_ess = 100, paretosmooth=TRUE, return_logliks = FALSE) {
 
   multistatemodels_env$draw_paths(model, min_ess = JuliaConnectoR::juliaCall("Int", min_ess), paretosmooth = paretosmooth, return_logliks = return_logliks)
@@ -582,7 +751,16 @@ draw_paths <- function(model, min_ess = 100, paretosmooth=TRUE, return_logliks =
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' cumulative_incidence(t=0.5, model=model_fit)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 cumulative_incidence <- function(t, model, subj=1) {
 
   multistatemodels_env$cumulative_incidence(t, model, JuliaConnectoR::juliaCall("Int", subj))
@@ -601,7 +779,17 @@ cumulative_incidence <- function(t, model, subj=1) {
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' model_fit <- set_parameters(model = model_fit, newvalues = list(h12 = c(log(1.25), log(1.5)),
+#' h13 = c(log(1.25), log(1)), h23 = c(log(1.25), log(2))))
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 set_parameters <- function(model, newvalues) {
 
   values <- NULL
@@ -645,11 +833,24 @@ set_parameters <- function(model, newvalues) {
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' d <- simulate(model = model_fit)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 simulate <- function(model, nsim=1, data=TRUE, paths=FALSE, delta_u = sqrt(.Machine$double.eps), delta_t = sqrt(.Machine$double.eps)) {
 
   sim_dat <- multistatemodels_env$simulate(model, nsim = JuliaConnectoR::juliaCall("Int", nsim), data=data, paths=paths, delta_u=delta_u, delta_t=delta_t)
-  as.data.frame(sim_dat[[1]])
+  if (isFALSE(paths)) {
+    as.data.frame(sim_dat[[1]])
+  } else {
+    JuliaConnectoR::juliaGet(sim_dat)
+  }
 
 }
 
@@ -667,7 +868,18 @@ simulate <- function(model, nsim=1, data=TRUE, paths=FALSE, delta_u = sqrt(.Mach
 #' @export
 #'
 #' @examples
-#'
+#' \donttest{
+#' h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+#' h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+#' h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+#' model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+#' model_fitted <- fit(model = model_fit, verbose=TRUE, compute_vcov = TRUE, ess_target_initial = 50,
+#' ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
+#' model_summary(model_fitted = model_fitted, estimate_likelihood = TRUE)
+#' \dontshow{
+#' JuliaConnectoR::stopJulia()
+#' }
+#' }
 model_summary <- function(model_fitted, confidence_level = 0.95, estimate_likelihood=FALSE, min_ess = 100) {
 
   multistatemodels_env$summary(model_fitted, confidence_level = confidence_level, estimate_likelihood=estimate_likelihood, min_ess = JuliaConnectoR::juliaCall("Int", min_ess))

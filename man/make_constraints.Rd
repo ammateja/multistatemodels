@@ -19,3 +19,11 @@ A Julia environment with a named Tuple of constraints
 \description{
 Make parameter constraints
 }
+\examples{
+\donttest{
+constraints_weibull <- make_constraints(cons = "h12_shape", lcons = 0, ucons = 0)
+\dontshow{
+JuliaConnectoR::stopJulia()
+}
+}
+}

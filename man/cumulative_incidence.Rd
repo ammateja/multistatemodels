@@ -21,3 +21,15 @@ possible transition and rows represent t
 Compute the cumulative incidence for each possible transition as a function of time since state entry.
 Assumes the subject starts their observation period at risk and saves cumulative incidence at the supplied vector of times, t.
 }
+\examples{
+\donttest{
+h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+cumulative_incidence(t=0.5, model=model_fit)
+\dontshow{
+JuliaConnectoR::stopJulia()
+}
+}
+}

@@ -15,3 +15,17 @@ Variance-covariance matrix
 \description{
 Return the variance covariance matrix at the maximum likelihood estimate.
 }
+\examples{
+\donttest{
+h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+model_fitted <- fit(model = model_fit, verbose=TRUE, compute_vcov = TRUE, ess_target_initial = 50,
+ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
+get_vcov(model_fitted=model_fitted)
+\dontshow{
+JuliaConnectoR::stopJulia()
+}
+}
+}

@@ -18,3 +18,15 @@ A Julia environment with a named Tuple
 Estimate the log marginal likelihood for a fitted multistate model.
 Require that the minimum effective sample size per subject is greater than min_ess.
 }
+\examples{
+\donttest{
+h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+estimate_loglik(model = model_fit)
+\dontshow{
+JuliaConnectoR::stopJulia()
+}
+}
+}

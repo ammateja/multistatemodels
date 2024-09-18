@@ -22,3 +22,15 @@ A Julia environment with a named Tuple of sample paths
 Draw sample paths conditional on the data.
 Require that the minimum effective sample size is greater than min_ess.
 }
+\examples{
+\donttest{
+h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+draw_paths(model = model_fit)
+\dontshow{
+JuliaConnectoR::stopJulia()
+}
+}
+}

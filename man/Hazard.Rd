@@ -10,7 +10,7 @@ Hazard(
   stateto,
   family = c("exp", "wei", "sp"),
   degree = 3,
-  natural_spline = T,
+  natural_spline = TRUE,
   extrapolation = "linear",
   monotone = 0,
   knots = NULL,
@@ -50,4 +50,14 @@ An environment with a Julia hazard
 \description{
 Specify a parametric or semi-parametric baseline cause-specific
 hazard function.
+}
+\examples{
+\donttest{
+h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+\dontshow{
+JuliaConnectoR::stopJulia()
+}
+}
 }

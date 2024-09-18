@@ -28,3 +28,17 @@ loglik, AIC, BIC, MCSE_loglik
 \description{
 Summary of model output
 }
+\examples{
+\donttest{
+h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
+h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
+h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
+model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
+model_fitted <- fit(model = model_fit, verbose=TRUE, compute_vcov = TRUE, ess_target_initial = 50,
+ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
+model_summary(model_fitted = model_fitted, estimate_likelihood = TRUE)
+\dontshow{
+JuliaConnectoR::stopJulia()
+}
+}
+}
