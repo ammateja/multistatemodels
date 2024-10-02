@@ -22,9 +22,9 @@ check_data <- function(dat) {
 #' Setup Multistate Models with Julia packages
 #'
 #' @description
-#' This function should be run once after first installing the R package, and
-#' any time there are updates to the Julia MultistateModels package.
-#' This allows the necessary Julia packages to be installed before they can be used.
+#' This function should be run any time there are updates to the Julia  packages
+#' used (specifically MultistateModels).
+#' This allows the necessary Julia packages to be updated to use in R.
 #'
 #' @export
 #'
