@@ -16,7 +16,6 @@ A matrix of model parameters
 Return the model parameters
 }
 \examples{
-\donttest{
 h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
 h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
 h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
@@ -26,6 +25,5 @@ ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
 get_parameters(model_fitted=model_fitted)
 \dontshow{
 JuliaConnectoR::stopJulia()
-}
 }
 }

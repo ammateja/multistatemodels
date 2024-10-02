@@ -19,7 +19,6 @@ An integer with the log-likelihood at the MLE
 Return the log-likelihood at the maximum likelihood estimates.
 }
 \examples{
-\donttest{
 h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
 h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
 h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
@@ -29,6 +28,5 @@ ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
 get_loglik(model_fitted=model_fitted)
 \dontshow{
 JuliaConnectoR::stopJulia()
-}
 }
 }

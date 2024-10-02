@@ -52,12 +52,10 @@ Specify a parametric or semi-parametric baseline cause-specific
 hazard function.
 }
 \examples{
-\donttest{
 h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
 h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
 h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
 \dontshow{
 JuliaConnectoR::stopJulia()
-}
 }
 }

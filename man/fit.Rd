@@ -83,7 +83,6 @@ A fitted multistate models environment
 Fit a multistate model
 }
 \examples{
-\donttest{
 h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
 h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
 h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
@@ -92,6 +91,5 @@ model_fitted <- fit(model = model_fit, verbose=TRUE, compute_vcov = TRUE, ess_ta
 ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
 \dontshow{
 JuliaConnectoR::stopJulia()
-}
 }
 }

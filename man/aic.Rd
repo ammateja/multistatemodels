@@ -23,7 +23,6 @@ Akaike's Information Criterion, defined as -2\emph{log(L) + 2}k,
 where L is the likelihood and k is the number of consumed degrees of freedom.
 }
 \examples{
-\donttest{
 h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
 h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
 h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
@@ -33,6 +32,5 @@ ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
 aic(model_fitted = model_fitted)
 \dontshow{
 JuliaConnectoR::stopJulia()
-}
 }
 }

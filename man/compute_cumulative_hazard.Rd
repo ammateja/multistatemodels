@@ -24,7 +24,6 @@ An integer with the cumulative hazard over (tsart, tstop)
 Compute the cumulative hazard over (tstart,tstop).
 }
 \examples{
-\donttest{
 h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
 h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
 h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
@@ -32,6 +31,5 @@ model_fit <- multistatemodel(hazard = c(h12, h13, h23), data=illness_death_dat)
 compute_cumulative_hazard(tstart = 0, tstop =0.5, model=model_fit, hazard = "h12")
 \dontshow{
 JuliaConnectoR::stopJulia()
-}
 }
 }

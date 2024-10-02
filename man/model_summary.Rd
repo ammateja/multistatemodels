@@ -29,7 +29,6 @@ loglik, AIC, BIC, MCSE_loglik
 Summary of model output
 }
 \examples{
-\donttest{
 h12 <- Hazard(formula = 0~1, statefrom = 1, stateto=2, family="wei")
 h13 <- Hazard(formula = 0~1, statefrom = 1, stateto=3, family="wei")
 h23 <- Hazard(formula = 0~1, statefrom = 2, stateto=3, family="wei")
@@ -39,6 +38,5 @@ ascent_threshold = 0.2, stopping_threshold = 0.2, tol = 0.001)
 model_summary(model_fitted = model_fitted, estimate_likelihood = TRUE)
 \dontshow{
 JuliaConnectoR::stopJulia()
-}
 }
 }

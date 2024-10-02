@@ -20,10 +20,8 @@ Collapse subjects to create an internal representation of a
 dataset and optionally recompute a vector of sampling weights.
 }
 \examples{
-\donttest{
 d_collpased <- collapse_data(dat = illness_death_dat)
 \dontshow{
 JuliaConnectoR::stopJulia()
-}
 }
 }
