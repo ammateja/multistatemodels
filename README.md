@@ -12,6 +12,11 @@ interval censored data. This is a wrapper to the Julia package
 MultistateModels.jl. Add some more about why it is good to call Julia
 from R…advantages, etc.
 
+For a stable version of the package, including examples, to accompany
+the paper “Assessing treatment efficacy for interval censored endpoints
+using multistate semi-Markov models fit to multiple data streams”,
+please refer to: <https://github.com/ammateja/MultistateModelsPaper>.
+
 ## Installation
 
 You can install the development version of multistatemodels from
@@ -34,14 +39,8 @@ library(multistatemodels)
 #> The following object is masked from 'package:stats':
 #> 
 #>     simulate
-```
-
-``` r
 library(JuliaConnectoR)
 #> Warning: package 'JuliaConnectoR' was built under R version 4.3.3
-```
-
-``` r
 library(dplyr)
 #> 
 #> Attaching package: 'dplyr'
@@ -51,19 +50,10 @@ library(dplyr)
 #> The following objects are masked from 'package:base':
 #> 
 #>     intersect, setdiff, setequal, union
-```
-
-``` r
 library(binom)
 #> Warning: package 'binom' was built under R version 4.3.3
-```
-
-``` r
 library(survival)
 #> Warning: package 'survival' was built under R version 4.3.3
-```
-
-``` r
 
 #Function to make parameters
 makepars <- function() {

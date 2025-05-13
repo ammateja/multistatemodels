@@ -23,6 +23,8 @@ especially semi-Markov models, to panel data and interval censored data. This is
 wrapper to the Julia package MultistateModels.jl. Add some more about why it is
 good to call Julia from R...advantages, etc. 
 
+For a stable version of the package, including examples, to accompany the paper “Assessing treatment efficacy for interval censored endpoints using multistate semi-Markov models fit to multiple data streams”, please refer to: https://github.com/ammateja/MultistateModelsPaper. 
+
 ## Installation
 
 You can install the development version of multistatemodels from
